@@ -120,7 +120,7 @@
                     </li>
                     <row type="short">
                         <column>
-                            <custom-button type="default" size="full" @click="onChangeItem(newTask.items.length + '.title', '')">Добавить пункт</custom-button>
+                            <custom-button type="default" size="full" @click="onChangeItem({ name: newTask.items.length + '.title', value: ''})">Добавить пункт</custom-button>
                         </column>
                     </row>
                 </ol>
@@ -143,7 +143,7 @@
                     </li>
                     <row type="short">
                         <column>
-                            <custom-button type="default" size="full" @click="onChangeLink(newTask.links.length + '.title', '')">Добавить ссылку</custom-button>
+                            <custom-button type="default" size="full" @click="onChangeLink({ name: newTask.links.length + '.title', value: '' })">Добавить ссылку</custom-button>
                         </column>
                     </row>
                 </ol>
@@ -203,7 +203,11 @@ export default {
         getTask() {
             return this.newTask;
         },
-        onChange(name, value) {
+        onChange(event) {
+            const {
+                name,
+                value
+            } = event;
             switch (name) {
                 case 'length':
                     if (value === '') {
@@ -263,7 +267,11 @@ export default {
                     this.newTask[name] = value;
             }
         },
-        onChangeItem(name, value) {
+        onChangeItem(event) {
+            const {
+                name,
+                value
+            } = event;
             const [ id, prop ] = name.split('.');
             if (this.newTask.items[id]) {
                 this.newTask.items[id][prop] = value;
@@ -286,7 +294,11 @@ export default {
                 this.newTask.items.splice(i - 1, 0, item);
             }
         },
-        onChangeLink(name, value) {
+        onChangeLink(event) {
+            const {
+                name,
+                value
+            } = event;
             const [ id, prop ] = name.split('.');
             if (this.newTask.links[id]) {
                 this.newTask.links[id][prop] = value;
@@ -326,7 +338,11 @@ export default {
         openDescription(i) {
             this.openedDescriptionsOfItems.splice(i, 1, true);
         },
-        onAddTag(name, value) {
+        onAddTag(event) {
+            const {
+                name,
+                value
+            } = event;
             if (value && !this.newTask.tags.includes(value)) {
                 this.newTask.tags.push(value);
             }

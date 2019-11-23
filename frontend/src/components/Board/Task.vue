@@ -195,13 +195,21 @@ export default {
                 this.$refs.task.closest('.column-grid-item').style.zIndex = 1;
             }
         },
-        handleItem(id, checked) {
+        handleItem(event) {
+            const {
+                name,
+                value
+            } = event;
             const items = this.task.items.map(item => Object.assign({}, item));
-            items[id].done = checked ? Date.now() : 0;
+            items[name].done = value ? Date.now() : 0;
             this.$emit('update', this.task.id, { items: items });
         },
-        handleTask(id, checked) {
-            this.$emit('update', this.task.id, { done: checked ? Date.now() : 0 });
+        handleTask(event) {
+            const {
+                name,
+                value
+            } = event;
+            this.$emit('update', this.task.id, { done: value ? Date.now() : 0 });
             this.deactivate();
         },
         onEdit() {

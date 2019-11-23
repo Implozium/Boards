@@ -41,7 +41,11 @@ export default {
         getBoard() {
             return this.newBoard;
         },
-        onChange(name, value) {
+        onChange(event) {
+            const {
+                name,
+                value
+            } = event;
             switch (name) {
                 default:
                     this.newBoard[name] = value;

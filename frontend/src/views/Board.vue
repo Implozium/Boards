@@ -168,7 +168,11 @@ export default {
             this.closeModals();
             this.$store.dispatch('boards/remove', { id });
         },
-        onChange(name, value) {
+        onChange(event) {
+            const {
+                name,
+                value
+            } = event;
             this.modals.editing.board[name] = value;
         },
         updateBoard(aBoard) {
@@ -185,7 +189,11 @@ export default {
                     this.setBoard(boardId);
                 });
         },
-        onChangeInConstricting(name, value) {
+        onChangeInConstricting(event) {
+            const {
+                name,
+                value
+            } = event;
             this.modals.constricting[name] = value;
         },
         closeModals() {

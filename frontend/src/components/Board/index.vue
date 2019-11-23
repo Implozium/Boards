@@ -282,7 +282,11 @@ export default {
             this.modals.moving.task = this.tasks.find(task => task.id === id);
             this.modals.moving.boardId = this.modals.moving.task.boardId;
         },
-        onChangeInMoving(name, value) {
+        onChangeInMoving(event) {
+            const {
+                name,
+                value
+            } = event;
             this.modals.moving[name] = value;
         },
         onShowTask(id) {
@@ -404,7 +408,11 @@ export default {
                 this.filters.tags.push(tag);
             }
         },
-        setTextFilter(name, value) {
+        setTextFilter(event) {
+            const {
+                name,
+                value
+            } = event;
             this.filters.str = value;
             // if (this.filters.timer) {
             //     clearTimeout(this.filters.timer);

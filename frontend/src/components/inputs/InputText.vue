@@ -33,7 +33,10 @@
 </template>
 
 <script>
+import CustomEmitter from '@/mixins/CustomEmitter';
+
 export default {
+    mixins: [CustomEmitter],
     props: {
         "title": {
             type: String,
@@ -106,7 +109,7 @@ export default {
             } else {
                 this.ownError = '';
                 value = this.transformTo(value);
-                this.$emit('change', event.target.name, value);
+                this.emit('change', value);
             }
         },
         onFocus() {

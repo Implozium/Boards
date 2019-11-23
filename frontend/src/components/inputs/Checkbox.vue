@@ -6,7 +6,10 @@
 </template>
 
 <script>
+import CustomEmitter from '@/mixins/CustomEmitter';
+
 export default {
+    mixins: [CustomEmitter],
     props: {
         'name': {
             type: [String, Number],
@@ -29,7 +32,8 @@ export default {
     },
     methods: {
         check(event) {
-            this.$emit('click', this.name, event.target.checked);
+            this.emit('click', event.target.checked);
+            //this.$emit('click', this.name, event.target.checked);
         }
     },
 }
