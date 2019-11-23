@@ -1,0 +1,21 @@
+{
+    "name": "boards",
+    "version": "0.1.0",
+    "description": "",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "cross-env NODE_PATH=. node app/server.js",
+        "start": "npx cross-env NODE_PATH=. npx nodemon app/server.js"
+    },
+    "author": "Implozium",
+    "license": "ISC",
+    "dependencies": {
+        "cross-env": "^6.0.3",
+        "express": "^4.17.1",
+        "serve-favicon": "^2.5.0"
+    },
+    "devDependencies": {
+        "nodemon": "^1.19.2"
+    }
+}

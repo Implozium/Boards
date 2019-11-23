@@ -1,0 +1,6 @@
+{
+    "port": 80,
+    "static": "../dist",
+    "favicon": "../dist/img/favicon.ico",
+    "storage": "../storage"
+}

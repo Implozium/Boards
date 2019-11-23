@@ -1,0 +1,39 @@
+{
+    "name": "boards",
+    "version": "0.1.0",
+    "description": "tasks and to-do lists",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "npx webpack --mode=production",
+        "start": "npx webpack-dev-server --mode=development --hot"
+    },
+    "author": "Implozium",
+    "license": "ISC",
+    "devDependencies": {
+        "@babel/core": "^7.1.2",
+        "@babel/preset-env": "^7.1.0",
+        "@babel/preset-react": "^7.0.0",
+        "babel-loader": "^8.0.4",
+        "compression-webpack-plugin": "^3.0.0",
+        "copy-webpack-plugin": "^5.0.3",
+        "css-loader": "^2.1.1",
+        "extract-text-webpack-plugin": "^4.0.0-beta.0",
+        "html-loader": "^0.5.5",
+        "html-webpack-plugin": "^3.2.0",
+        "style-loader": "^0.23.1",
+        "vue-loader": "~15.6",
+        "vue-style-loader": "~4.1",
+        "vue-template-compiler": "~2.6",
+        "webpack": "^4.25.1",
+        "webpack-cli": "^3.1.2",
+        "webpack-dev-server": "^3.1.10"
+    },
+    "dependencies": {
+        "@babel/polyfill": "~7.2",
+        "marked": "^0.7.0",
+        "vue": "~2.6",
+        "vue-router": "~3.0",
+        "vuex": "^3.1.1"
+    }
+}
