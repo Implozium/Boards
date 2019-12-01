@@ -108,7 +108,7 @@
                         <row type="short">
                             <column>
                                 <input-text :name="i + '.title'" :value="item.title" :title="'Заголовок ' + (i + 1)" @change="onChangeItem" type="short"></input-text>
-                                <div v-if="openedDescriptionsOfItems[i] === false" @click="openDescription(i)" class="task-form__item-open-description">Добавить описание</div>
+                                <div v-if="itemsDescriptions[i] === false" @click="openDescription(i)" class="task-form__item-open-description">Добавить описание</div>
                                 <input-text v-else :name="i + '.description'" :value="item.description" :title="'Описание ' + (i + 1)" @change="onChangeItem" type="area"></input-text>
                             </column>
                             <div class="task-form__item-buttons">
@@ -181,12 +181,12 @@ export default {
         return {
             "newTask": Common.makeTask(this.task),
             "dateMs": 24 * 60 * 60 * 1000,
-            "openedDescriptionsOfItems": this.task.items.map(item => Boolean(item.description)),
+            "openedDescriptionsOfItems": this.task.items.map(item => false),
         };
     },
     computed: {
         "itemsDescriptions": function () {
-            return this.newTask.items.map(anItem => Boolean(anItem.description));
+            return this.newTask.items.map((anItem, i) => this.openedDescriptionsOfItems[i] || Boolean(anItem.description));
         },
         "length": function () {
             if (this.newTask.type === 'period') {
