@@ -22,15 +22,41 @@
         <div class="board__tasks" v-if="board">
             <column-grid :minSubcolumnWidth="320" v-show="state === 'active'">
                 <column-grid-item v-for="wrapper in wrappedActiveTasks" :key="wrapper.task.id" :column="wrapper.column">
-                    <task :task="wrapper.task" :type="wrapper.type"
-                        @edit="onEditTask" @remove="onRemoveTask" @archive="onArchiveTask" @update="subupdateTask" @move="onMoveTask" @show="onShowTask" @expand="onExpandTask">
+                    <task
+                        :task="wrapper.task"
+                        :type="wrapper.type"
+                        @edit="onEditTask"
+                        @remove="onRemoveTask"
+                        @archive="onArchiveTask"
+                        @update="subupdateTask"
+                        @move="onMoveTask"
+                        @show="onShowTask"
+                        @expand="onExpandTask"
+                        @copy="onCopyTask"
+                        @extract="onExtractTask"
+                        @separate="onSeparateTask"
+                        @attach="onAttachTask"
+                    >
                     </task>
                 </column-grid-item>
             </column-grid>
             <column-grid :minSubcolumnWidth="320" v-show="state === 'archival'">
                 <column-grid-item v-for="wrapper in wrappedArchivalTasks" :key="wrapper.task.id" :column="wrapper.column">
-                    <task :task="wrapper.task" :type="wrapper.type"
-                        @edit="onEditTask" @remove="onRemoveTask" @archive="onArchiveTask" @update="subupdateTask" @move="onMoveTask" @show="onShowTask" @expand="onExpandTask">
+                    <task
+                        :task="wrapper.task"
+                        :type="wrapper.type"
+                        @edit="onEditTask"
+                        @remove="onRemoveTask"
+                        @archive="onArchiveTask"
+                        @update="subupdateTask"
+                        @move="onMoveTask"
+                        @show="onShowTask"
+                        @expand="onExpandTask"
+                        @copy="onCopyTask"
+                        @extract="onExtractTask"
+                        @separate="onSeparateTask"
+                        @attach="onAttachTask"
+                    >
                     </task>
                 </column-grid-item>
             </column-grid>
@@ -93,6 +119,61 @@
                 <custom-button type="primary" @click="expandTask(modals.expanding.task.id), closeModals()">Преобразовать</custom-button>
             </template>
         </modal>
+        <modal v-if="modals.extracting.show" @hide="closeModals" type="short">
+            <template v-slot:header>
+                Какие пункты этой задачи извлечь в отдельные задачи<br/>"<b>{{ modals.extracting.task.title }}</b>"?
+            </template>
+            <template v-slot:default>
+                <ol>
+                    <li v-for="(item, i) in modals.extracting.task.items" :key="i">
+                        <checkbox
+                            :checked="modals.extracting.itemsIds[i] === true"
+                            :name="i"
+                            @click="modals.extracting.itemsIds[$event.name] = $event.value"
+                        ></checkbox>{{ item.title }}
+                    </li>
+                </ol>
+            </template>
+            <template v-slot:footer>
+                <custom-button type="primary" @click="extractTask(modals.extracting.task.id, modals.extracting.itemsIds), closeModals()">Извлечь</custom-button>
+            </template>
+        </modal>
+        <modal v-if="modals.separating.show" @hide="closeModals" type="short">
+            <template v-slot:header>
+                Какие пункты этой задачи переместить в новую задачу<br/>"<b>{{ modals.separating.task.title }}</b>"?
+            </template>
+            <template v-slot:default>
+                <ol>
+                    <li v-for="(item, i) in modals.separating.task.items" :key="i">
+                        <checkbox
+                            :checked="modals.separating.itemsIds[i] === true"
+                            :name="i"
+                            @click="modals.separating.itemsIds[$event.name] = $event.value"
+                        ></checkbox>{{ item.title }}
+                    </li>
+                </ol>
+            </template>
+            <template v-slot:footer>
+                <custom-button type="primary" @click="separateTask(modals.separating.task.id, modals.separating.itemsIds), closeModals()">Разделить (переместить)</custom-button>
+            </template>
+        </modal>
+        <modal v-if="modals.attaching.show" @hide="closeModals" type="short">
+            <template v-slot:header>
+                Слияние задачи<br/>"<b>{{ modals.attaching.task.title }}</b>"?
+            </template>
+            <template v-slot:default>
+                <input-select
+                    name="toTaskId"
+                    title="Задача к которой присоединится эта задача"
+                    :value="modals.attaching.toTaskId"
+                    :items="tasks.filter(aTask => aTask.id !== modals.attaching.task.id).map(aTask => ({ title: aTask.title, value: aTask.id }))"
+                    @change="modals.attaching.toTaskId = $event.value"
+                ></input-select>
+            </template>
+            <template v-slot:footer>
+                <custom-button type="primary" @click="attachTask(modals.attaching.task.id, modals.attaching.toTaskId), closeModals()">Влить</custom-button>
+            </template>
+        </modal>
     </div>
 </template>
 
@@ -103,6 +184,7 @@ import ColumnGrid from '@/components/common/ColumnGrid';
 import ColumnGridItem from '@/components/common/ColumnGrid/ColumnGridItem.vue';
 import CustomButton from '@/components/common/CustomButton.vue';
 import InputSelect from '@/components/inputs/InputSelect.vue';
+import Checkbox from '@/components/inputs/Checkbox.vue';
 import InputText from '@/components/inputs/InputText.vue';
 import Tag from '@/components/common/Tag.vue';
 import Task from './Task.vue';
@@ -119,6 +201,7 @@ export default {
         InputSelect,
         Tag,
         InputText,
+        Checkbox,
     },
     props: {
         "boardId": {
@@ -154,6 +237,21 @@ export default {
                 expanding: {
                     show: false,
                     task: null,
+                },
+                extracting: {
+                    show: false,
+                    task: null,
+                    itemsIds: null,
+                },
+                separating: {
+                    show: false,
+                    task: null,
+                    itemsIds: null,
+                },
+                attaching: {
+                    show: false,
+                    task: null,
+                    toTaskId: null,
                 },
             },
             timer: null,
@@ -299,6 +397,30 @@ export default {
             this.modals.expanding.show = true;
             this.modals.expanding.task = this.tasks.find(task => task.id === id);
         },
+        onCopyTask(id) {
+            this.$store.dispatch('tasks/copy', { id: id });
+        },
+        onExtractTask(id) {
+            this.closeModals();
+            this.modals.extracting.show = true;
+            this.modals.extracting.task = this.tasks.find(task => task.id === id);
+            this.modals.extracting.itemsIds = this.modals.extracting.task.items.map(item => false);
+        },
+        onSeparateTask(id) {
+            this.closeModals();
+            this.modals.separating.show = true;
+            this.modals.separating.task = this.tasks.find(task => task.id === id);
+            this.modals.separating.itemsIds = this.modals.separating.task.items.map(item => false);
+        },
+        onAttachTask(id) {
+            this.closeModals();
+            if (this.tasks.length < 2) {
+                return;
+            }
+            this.modals.attaching.show = true;
+            this.modals.attaching.task = this.tasks.find(task => task.id === id);
+            this.modals.attaching.toTaskId = this.tasks.find(task => task.id !== id).id;
+        },
         closeModals() {
             Object.keys(this.modals).forEach(key => this.modals[key].show = false);
         },
@@ -322,6 +444,15 @@ export default {
         expandTask(id) {
             this.$store.dispatch('tasks/expand', { id: id })
                 .then(() => this.$emit('change-board', id));
+        },
+        extractTask(id, itemsIds) {
+            this.$store.dispatch('tasks/extract', { id: id, itemsIds: itemsIds.reduce((res, checked, i) => checked ? res.concat(i) : res, []) });
+        },
+        separateTask(id, itemsIds) {
+            this.$store.dispatch('tasks/separate', { id: id, itemsIds: itemsIds.reduce((res, checked, i) => checked ? res.concat(i) : res, []) });
+        },
+        attachTask(id, toTaskId) {
+            this.$store.dispatch('tasks/attach', { id: id, toTaskId: toTaskId });
         },
         getTaskType(aTask) {
             if (aTask.type === 'common') {
@@ -393,7 +524,7 @@ export default {
             this.resetFilter();
             return Promise.all([
                 this.$store.dispatch('boards/load'),
-                this.$store.dispatch('tasks/load', { boadrId: this.boardId })
+                this.$store.dispatch('tasks/load', { boardId: this.boardId })
             ])
                 .then((arr) => {
                 })

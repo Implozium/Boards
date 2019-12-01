@@ -16,20 +16,20 @@ class Cache {
      * @param {*} data значение, которое с помощью JSON.stringify заносится в кеш
      * @param {object} params объект опций
      * @param {number=} params.expiresIn срок действия ключа
-     * @return {Promise.<Cache>} который разрешиться при добавлении значения ключа с текущим кешем
+     * @return {Promise.<Cache>} промис который разрешиться при добавлении значения ключа с текущим кешем
      */
     set(key, data, params = {}) {
         console.log('cache set', key);
         this.cache.set(key, JSON.stringify({
             data,
-            to: Number(params.expiresIn) > 0 ? Date.now() + Number(params.expiresIn) : Number.POSITIVE_INFINITY,
+            to: !isNaN(Number(params.expiresIn)) ? Date.now() + Number(params.expiresIn) : Number.MAX_SAFE_INTEGER,
         }));
         return Promise.resolve(this);
     }
     /**
      * Получает значение по ключу `key` из кеша
      * @param {string} key ключ
-     * @return {Promise.<*>} который разрешиться значение ключа с помощью JSON.parse или undefined если значения по ключу нет
+     * @return {Promise.<*>} промис который разрешиться значение ключа с помощью JSON.parse или undefined если значения по ключу нет
      *  или истекло время жизни ключа
      */
     get(key) {
@@ -50,7 +50,7 @@ class Cache {
     /**
      * Удаляет значение по ключу `key` из кеша
      * @param {string} key ключ
-     * @return {Promise.<Cache>} который разрешиться при добавлении значения ключа с текущим кешем
+     * @return {Promise.<Cache>} промис который разрешиться при добавлении значения ключа с текущим кешем
      */
     delete(key) {
         this.cache.delete(key);

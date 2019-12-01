@@ -56,6 +56,30 @@ const API = {
                 return true;
             });
     },
+    copyTask(id) {
+        return Request.post(`/api/tasks/${id}/actions/copy`, {})
+            .then((res) => {
+                return true;
+            });
+    },
+    extractTask(id, itemsIds) {
+        return Request.post(`/api/tasks/${id}/actions/extract`, { itemsIds })
+            .then((res) => {
+                return true;
+            });
+    },
+    separateTask(id, itemsIds) {
+        return Request.post(`/api/tasks/${id}/actions/separate`, { itemsIds })
+            .then((res) => {
+                return true;
+            });
+    },
+    attachTask(id, toTaskId) {
+        return Request.post(`/api/tasks/${id}/actions/attach`, { toTaskId })
+            .then((res) => {
+                return true;
+            });
+    },
 };
 
 export default API;

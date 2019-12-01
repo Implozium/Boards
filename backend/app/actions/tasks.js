@@ -3,11 +3,11 @@ const BoardsList = require('app/entities/BoardsList');
 const common = require('common');
 
 module.exports = {
-    loadAll({ username, boadrId }) {
+    loadAll({ username, boardId }) {
         return TasksList.load({ username })
             .then((aTasksList) => {
-                if (boadrId) {
-                    return aTasksList.tasks.filter(aTask => aTask.boardId === boadrId);
+                if (boardId) {
+                    return aTasksList.tasks.filter(aTask => aTask.boardId === boardId);
                 } else {
                     return aTasksList.tasks;
                 }
@@ -51,7 +51,7 @@ module.exports = {
                     tags: aTask.tags,
                 });
                 aTasksList.remove(aTask.id);
-                aTask.items.forEach(item => {
+                aTask.items.forEach((item) => {
                     aTasksList.update({
                         id: common.makeGuid(),
                         title: item.title,
@@ -76,5 +76,84 @@ module.exports = {
                 ]);
             })
             .then(() => true);
+    },
+    copy({ username, id }) {
+        return TasksList.load({ username })
+            .then((aTasksList) => {
+                const aTask = aTasksList.tasks.find(aTask => aTask.id === id);
+                if (!aTask) {
+                    return true;
+                }
+                const newTask = common.makeTask(aTask);
+                newTask.title = newTask.title + ' (копия)';
+                newTask.id = common.makeGuid();
+                aTasksList.update(newTask);
+                return aTasksList.save();
+            });
+    },
+    extract({ username, id, itemsIds }) {
+        return TasksList.load({ username })
+            .then((aTasksList) => {
+                const aTask = aTasksList.tasks.find(aTask => aTask.id === id);
+                if (!aTask) {
+                    return true;
+                }
+                if (!aTask.items.length) {
+                    return true;
+                }
+                aTask.items.filter((item, i) => itemsIds.includes(i))
+                    .forEach((item) => {
+                        const newTask = common.makeTask(aTask);
+                        newTask.title = item.title;
+                        newTask.done = item.done ? Date.now() : 0;
+                        newTask.description = item.description;
+                        newTask.created = Date.now();
+                        newTask.items = [];
+                        newTask.id = common.makeGuid();
+                        aTasksList.update(newTask);
+                    });
+                aTask.items = aTask.items.filter((item, i) => !itemsIds.includes(i));
+                return aTasksList.save();
+            });
+    },
+    separate({ username, id, itemsIds }) {
+        return TasksList.load({ username })
+            .then((aTasksList) => {
+                const aTask = aTasksList.tasks.find(aTask => aTask.id === id);
+                if (!aTask) {
+                    return true;
+                }
+                if (!aTask.items.length) {
+                    return true;
+                }
+                const newTask = common.makeTask(aTask);
+                newTask.title = newTask.title + ' (дополнение)';
+                newTask.done = aTask.done ? Date.now() : 0;
+                newTask.created = Date.now();
+                newTask.id = common.makeGuid();
+                newTask.items = newTask.items.filter((item, i) => itemsIds.includes(i));
+                aTasksList.update(newTask);
+                aTask.items = aTask.items.filter((item, i) => !itemsIds.includes(i));
+                return aTasksList.save();
+            });
+    },
+    attach({ username, id, toTaskId }) {
+        return TasksList.load({ username })
+            .then((aTasksList) => {
+                const aTask = aTasksList.tasks.find(aTask => aTask.id === id);
+                const toTask = aTasksList.tasks.find(aTask => aTask.id === toTaskId);
+                if (!aTask || !toTask) {
+                    return true;
+                }
+                if (aTask.description) {
+                    toTask.description += toTask.description ? '\n\n---\n\n' : '';
+                    toTask.description += aTask.description;
+                }
+                toTask.tags = toTask.tags.concat(aTask.tags.filter(tag => !toTask.tags.includes(tag)));
+                toTask.items = toTask.items.concat(aTask.items);
+                toTask.links = toTask.links.concat(aTask.links.filter(link => !toTask.links.find(aLink => aLink.title === link.title && aLink.href === link.href)));
+                aTasksList.remove(id);
+                return aTasksList.save();
+            });
     },
 };

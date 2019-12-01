@@ -29,6 +29,10 @@
                                     <menu-block-item @click="onOpen" v-if="task.description || task.items.length">{{ task.open ? 'свернуть' : 'развернуть' }}</menu-block-item>
                                     <menu-block-hr></menu-block-hr>
                                     <menu-block-item title="Преобразовать в доску" @click="onExpand">расширить</menu-block-item>
+                                    <menu-block-item title="Добавить копию задачи в текущую доску" @click="onCopy">копировать</menu-block-item>
+                                    <menu-block-item v-if="task.items.length" title="Разбить пункты этой задачи на отдельные задачи" @click="onExtract">разбить</menu-block-item>
+                                    <menu-block-item v-if="task.items.length" title="Разделить (переместить) пункты этой задачи в новую задачу" @click="onSeparate">разделить</menu-block-item>
+                                    <menu-block-item title="Присоединить эту задачу к другой задаче" @click="onAttach">присоединить&nbsp;к</menu-block-item>
                                     <menu-block-hr></menu-block-hr>
                                     <menu-block-item @click="onRemove">удалить</menu-block-item>
                                 </menu-block>
@@ -238,6 +242,22 @@ export default {
         },
         onExpand() {
             this.$emit('expand', this.task.id);
+            this.deactivate();
+        },
+        onCopy() {
+            this.$emit('copy', this.task.id);
+            this.deactivate();
+        },
+        onExtract() {
+            this.$emit('extract', this.task.id);
+            this.deactivate();
+        },
+        onSeparate() {
+            this.$emit('separate', this.task.id);
+            this.deactivate();
+        },
+        onAttach() {
+            this.$emit('attach', this.task.id);
             this.deactivate();
         },
         clickTask() {

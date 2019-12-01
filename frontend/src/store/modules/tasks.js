@@ -58,8 +58,8 @@ export default {
         }
     },
     actions: {
-        load({ commit }, { boadrId }) {
-            return API.loadTasks(boadrId)
+        load({ commit }, { boardId }) {
+            return API.loadTasks(boardId)
                 .then((tasks) => {
                     commit('set', { tasks });
                 })
@@ -107,6 +107,46 @@ export default {
         },
         clear({ commit }, {}) {
             commit('clear', {});
+        },
+        copy({ commit, getters, dispatch }, { id }) {
+            return API.copyTask(id)
+                .then((res) => {
+                    const task = getters['taskById'](id);
+                    return dispatch('load', { boardId: task.boardId });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        },
+        extract({ commit, getters, dispatch }, { id, itemsIds }) {
+            return API.extractTask(id, itemsIds)
+                .then((res) => {
+                    const task = getters['taskById'](id);
+                    return dispatch('load', { boardId: task.boardId });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        },
+        separate({ commit, getters, dispatch }, { id, itemsIds }) {
+            return API.separateTask(id, itemsIds)
+                .then((res) => {
+                    const task = getters['taskById'](id);
+                    return dispatch('load', { boardId: task.boardId });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        },
+        attach({ commit, getters, dispatch }, { id, toTaskId }) {
+            return API.attachTask(id, toTaskId)
+                .then((res) => {
+                    const task = getters['taskById'](id);
+                    return dispatch('load', { boardId: task.boardId });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
         },
     },
     modules: {
