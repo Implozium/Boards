@@ -4,7 +4,7 @@
         <textarea
             v-if="type === 'area'"
             class="input-text__input"
-            :class="{ 'input-text__input_tall': true }"
+            :class="{ 'input-text__input_tall': true, 'input-text__input_monospace': monospace }"
             :name="name"
             :value="val"
             @change="onChange"
@@ -74,6 +74,10 @@ export default {
         "validators": {
             type: Array,
             default: () => [],
+        },
+        "monospace": {
+            type: Boolean,
+            default: false,
         }
     },
     data: function () {
@@ -183,6 +187,9 @@ export default {
         min-height: 104px;
         height: 104px;
         resize: vertical;
+    }
+    .input-text__input_monospace {
+        font-family: monospace;
     }
     .input-text__short {
         padding-top: 4px;

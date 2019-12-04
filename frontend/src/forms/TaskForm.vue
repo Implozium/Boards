@@ -97,7 +97,7 @@
         </row>
         <row>
             <column>
-                <input-text name="description" :value="newTask.description" title="Описание" type="area" @change="onChange"></input-text>
+                <input-text name="description" :value="newTask.description" title="Описание" type="area" @change="onChange" :monospace="true"></input-text>
             </column>
         </row>
         <row>
@@ -109,7 +109,7 @@
                             <column>
                                 <input-text :name="i + '.title'" :value="item.title" :title="'Заголовок ' + (i + 1)" @change="onChangeItem" type="short"></input-text>
                                 <div v-if="itemsDescriptions[i] === false" @click="openDescription(i)" class="task-form__item-open-description">Добавить описание</div>
-                                <input-text v-else :name="i + '.description'" :value="item.description" :title="'Описание ' + (i + 1)" @change="onChangeItem" type="area"></input-text>
+                                <input-text v-else :name="i + '.description'" :value="item.description" :title="'Описание ' + (i + 1)" @change="onChangeItem" type="area" :monospace="true"></input-text>
                             </column>
                             <div class="task-form__item-buttons">
                                 <div class="task-form__item-button" @click="onRemoveItem(i)" title="Удалить">×</div>
