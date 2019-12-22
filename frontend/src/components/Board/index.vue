@@ -8,11 +8,12 @@
                 </template>
             </div>
             <template v-if="board">
-                <div class="board__info-task-state" :class="{ 'board__info-task-state_active': state === 'archival' }" @click="setState('archival')">Архивные</div>
-                <div class="board__info-task-state" :class="{ 'board__info-task-state_active': state === 'active' }" @click="setState('active')">Активные</div>
                 <div class="board__info-block">
-                    <div class="board__info-button board__info-button_add" v-show="state === 'active'" @click="onEditTask">+ Новая задача</div>
+                    <div class="board__info-button board__info-button_add" @click="onEditTask">+ Новая задача</div>
                     <input-text :value="filters.str" name="str" title="Поиск" @change="setTextFilter"></input-text>
+                    <div>
+                        <label><checkbox :checked="filters.archival" name="archival" @click="setArchival"/> Архивные</label>
+                    </div>
                     <div class="board__info-tags">
                         <tag v-for="(tag) in tags" :key="tag" :has-activing="true" @click="toggleTag(tag)" :status="filters.tags.includes(tag) ? 'actived' : 'default'">{{ tag }}</tag>
                     </div>
@@ -20,28 +21,8 @@
             </template>
         </div>
         <div class="board__tasks" v-if="board">
-            <column-grid :minSubcolumnWidth="320" v-show="state === 'active'">
-                <column-grid-item v-for="wrapper in wrappedActiveTasks" :key="wrapper.task.id" :column="wrapper.column">
-                    <task
-                        :task="wrapper.task"
-                        :type="wrapper.type"
-                        @edit="onEditTask"
-                        @remove="onRemoveTask"
-                        @archive="onArchiveTask"
-                        @update="subupdateTask"
-                        @move="onMoveTask"
-                        @show="onShowTask"
-                        @expand="onExpandTask"
-                        @copy="onCopyTask"
-                        @extract="onExtractTask"
-                        @separate="onSeparateTask"
-                        @attach="onAttachTask"
-                    >
-                    </task>
-                </column-grid-item>
-            </column-grid>
-            <column-grid :minSubcolumnWidth="320" v-show="state === 'archival'">
-                <column-grid-item v-for="wrapper in wrappedArchivalTasks" :key="wrapper.task.id" :column="wrapper.column">
+            <column-grid :minSubcolumnWidth="320">
+                <column-grid-item v-for="wrapper in wrappedTasks" :key="wrapper.task.id" :column="wrapper.column">
                     <task
                         :task="wrapper.task"
                         :type="wrapper.type"
@@ -210,7 +191,6 @@ export default {
     },
     data() {
         return {
-            state: 'active', // 'archival'
             time: Date.now(),
             modals: {
                 editing: {
@@ -269,6 +249,7 @@ export default {
                 tags: [],
                 str: '',
                 timer: null,
+                archival: false
             }
         };
     },
@@ -297,6 +278,9 @@ export default {
                     if (this.filters.tags.length) {
                         has = has && aTask.tags.some(tag => this.filters.tags.includes(tag));
                     }
+                    if (!this.filters.archival) {
+                        has = has && aTask.archival === 0;
+                    }
                     return has;
                 })
                 .map((aTask) => {
@@ -309,17 +293,8 @@ export default {
                 })
                 .sort((aWrapper, bWrapper) => aWrapper.task.from && bWrapper.task.from ? aWrapper.task.from - bWrapper.task.from : aWrapper.task.from ? -1 : 1); // aWrapper.task.done ? 1 : bWrapper.task.done ? -1 : 
         },
-        wrappedActiveTasks() {
-            return this.wrappedTasks
-                .filter(({ task }) => task.archival === 0);
-        },
-        wrappedArchivalTasks() {
-            return this.wrappedTasks
-                .filter(({ task }) => task.archival !== 0);
-        },
         tags() {
             return this.tasks
-                .filter(aTask => this.state === 'active' ? aTask.archival === 0 : aTask.archival !== 0)
                 .reduce((tags, aTask) => {
                     aTask.tags.forEach((tag) => {
                         if (!tags.includes(tag)) {
@@ -335,9 +310,6 @@ export default {
         "boardId": function () {
             this.init();
         },
-        "state": function () {
-            this.resetFilter();
-        }
     },
     created() {
         this.timer = setInterval(() => {
@@ -356,8 +328,8 @@ export default {
                 str: '',
             };
         },
-        setState(state) {
-            this.state = state;
+        setArchival({ value }) {
+            this.filters.archival = value;
         },
         onEditTask(id) {
             this.closeModals();
@@ -584,7 +556,7 @@ export default {
         display: flex;
         margin-bottom: 16px;
     }
-    .board__info-task-state {
+    /* .board__info-task-state {
         line-height: 14px;
         margin-top: 14px;
         box-sizing: border-box;
@@ -603,7 +575,7 @@ export default {
         border-bottom-left-radius: 4px;
         border-right: 2px solid #627a9d;
         margin-right: -1px;
-    }
+    } */
     .board__info-block {
         margin-right: 8px;
     }

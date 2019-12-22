@@ -7,8 +7,7 @@
                     <div class="task__title">
                         <div class="task__title-upper">
                             <span
-                                >{{ task.title }}&nbsp;<span class="task__title-badge"
-                                >
+                                >{{ task.title }}&nbsp;<span class="task__title-badge">
                                     <span class="task__title-badge-item task__title-badge-item_links" v-if="task.links.length">{{ task.links.length }}</span><span class="task__title-badge-item task__title-badge-item_items" v-if="task.items.length">{{ task.items.length - undoneItems.length }} / {{ task.items.length }}</span>
                                 </span>
                             </span>
@@ -39,14 +38,15 @@
                             </div>
                         </div>
                         <!--<div class="task__title-length" v-if="taskInfo.allTime">({{ taskInfo.allTime }})</div>-->
-                        <div class="task__title-tags" v-if="task.tags.length">
-                            <tag v-for="(tag) in task.tags" :key="tag">{{ tag }}</tag>
-                        </div>
                         <div class="task__title-info">
+                            <div v-if="task.archival !== 0" class="task__title-info-item task__title-info-item_archival">архивная</div>
                             <div v-if="taskInfo.allTime" class="task__title-info-item">{{ taskInfo.allTime }}</div>
                             <div v-if="!taskInfo.isDone && type === 'past' && taskInfo.afterTo" class="task__title-info-item task__title-info-item_past">{{ taskInfo.afterTo }}</div>
                             <div v-else-if="!taskInfo.isDone && type === 'present' && taskInfo.beforeTo" class="task__title-info-item task__title-info-item_present">{{ taskInfo.beforeTo }}</div>
                             <div v-else-if="!taskInfo.isDone && type === 'future' && taskInfo.beforeFrom" class="task__title-info-item task__title-info-item_future">{{ taskInfo.beforeFrom }}</div>
+                        </div>
+                        <div class="task__title-tags" v-if="task.tags.length">
+                            <tag v-for="(tag) in task.tags" :key="tag">{{ tag }}</tag>
                         </div>
                     </div>
                 </div>
@@ -488,6 +488,16 @@ export default {
     }
     .task__title-info-item_future::before {
         border: 2px solid #49cc90;
+    }
+    .task__title-info-item_archival {
+        color: #a0a0a0;
+        background-color: #fff;
+        border-color: #a0a0a0;
+        /* text-shadow: 0 0 0px black; */
+        font-weight: 600;
+    }
+    .task__title-info-item_archival::before {
+        border-color: #a0a0a0;
     }
     .task__buttons {
         display: flex;

@@ -71,4 +71,7 @@ export default {
     .markdown h2 {
         font-size: 16px;
     }
+    .markdown table {
+        width: 100%;
+    }
 </style>
