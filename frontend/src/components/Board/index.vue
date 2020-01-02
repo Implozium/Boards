@@ -42,7 +42,7 @@
                 </column-grid-item>
             </column-grid>
         </div>
-        <modal v-if="modals.editing.show" @hide="closeModals" :close-on-wrap="false">
+        <modal v-if="modals.editing.show" @hide="closeModals" :close-on-wrap="false" type="full">
             <template v-slot:header>
                 Редактировать задачу
             </template>

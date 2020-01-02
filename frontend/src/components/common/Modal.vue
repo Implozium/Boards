@@ -33,7 +33,7 @@ export default {
         "type": {
             type: String,
             default: 'wide',
-            validator: (val) => ['wide', 'short', 'raw'].includes(val),
+            validator: (val) => ['wide', 'short', 'raw', 'full'].includes(val),
         }
     },
     data: function () {
@@ -84,7 +84,8 @@ export default {
         z-index: 2;
     }
     .modal__container_wide,
-    .modal__container_short {
+    .modal__container_short,
+    .modal__container_full {
         width: 800px;
         background-color: white;
         border: 0px solid grey;
@@ -103,6 +104,9 @@ export default {
     }
     .modal__container_raw {
         max-width: 600px;
+    }
+    .modal__container_full {
+        width: calc(100% - 50px);
     }
     .modal__header {
         font-size: 14px;

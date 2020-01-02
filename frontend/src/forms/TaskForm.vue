@@ -101,9 +101,9 @@
             </column>
         </row>
         <row>
-            <column>
+            <column type="md">
                 <row class="task-form__header task-form__header_offset">Пункты:</row>
-                <ol>
+                <ol class="task-form__header-list-items">
                     <li v-for="(item, i) in newTask.items" :key="i" class="task-form__header-list-item">
                         <row type="short">
                             <column>
@@ -503,8 +503,19 @@ export default {
     .task-form__header_offset {
         padding-left: 40px;
     }
-    .task-form__header-list-item + .task-form__header-list-item {
+    .task-form__header-list-items {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .task-form__header-list-item {
+        min-width: 280px;
+        margin-left: 20px;
+        /* flex-grow: 1; */
+        margin-bottom: 20px;
+    }
+    /* .task-form__header-list-item + .task-form__header-list-item {
         border-top: 1px solid lightgrey;
         padding-top: 8px;
-    }
+    } */
+
 </style>
