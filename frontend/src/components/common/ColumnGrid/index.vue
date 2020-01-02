@@ -20,6 +20,24 @@ export default {
         return {
             timer: null,
             isFinished: true,
+            items: [],
+        };
+    },
+    provide: function () {
+        return {
+            addItem: (anItem) => {
+                if (!this.items.includes(anItem)) {
+                    this.items.push(anItem);
+                }
+                this.items.sort((a, b) => +a.getAttribute("column") - +b.getAttribute("column"));
+            },
+            removeItem: (anItem) => {
+                const id = this.items.indexOf(anItem);
+                if (id !== -1) {
+                    this.items.splice(id, 1);
+                }
+                this.items.sort((a, b) => +a.getAttribute("column") - +b.getAttribute("column"));
+            },
         };
     },
     computed: {
@@ -45,7 +63,8 @@ export default {
             if (this.$el.hidden === true || this.$el.offsetParent === null) {
                 return;
             }
-            const items = Array.from(this.$el.querySelectorAll('.column-grid-item')).sort((a, b) => +a.getAttribute("column") - +b.getAttribute("column"));
+            // const items = Array.from(this.$el.querySelectorAll('.column-grid-item')).sort((a, b) => +a.getAttribute("column") - +b.getAttribute("column"));
+            const items = this.items;
             const infoOfColumns = items.reduce((obj, item, i) => {
                 const column = +item.getAttribute("column");
                 if (!obj[column]) {
@@ -62,7 +81,8 @@ export default {
             }, {});
 
             const countOfColumn = Object.keys(infoOfColumns).length;
-            const countOfSubColumns = Math.min(Math.floor(this.$el.getBoundingClientRect().width / this.minSubcolumnWidth) || 1, items.length);
+            // const countOfSubColumns = Math.min(Math.floor(this.$el.getBoundingClientRect().width / this.minSubcolumnWidth) || 1, items.length);
+            const countOfSubColumns = Math.floor(this.$el.getBoundingClientRect().width / this.minSubcolumnWidth) || 1;
             const arrayOfInfo = Object.values(infoOfColumns).sort((a, b) => a.id - b.id);
 
             if (countOfColumn > countOfSubColumns) {

@@ -1,19 +1,26 @@
 <template>
-    <div class="column-grid-item" :column="column">
+    <div class="column-grid-item" :column="column" ref="item">
         <slot></slot>
     </div>
 </template>
 
 <script>
 export default {
-    data: function () {
-        return {};
-    },
     props: {
         "column": {
             type: Number,
             default: 0,
         },
+    },
+    data: function () {
+        return {};
+    },
+    inject: ["addItem", "removeItem"],
+    mounted: function () {
+        this.addItem(this.$refs.item);
+    },
+    beforeDestroy: function () {
+        this.removeItem(this.$refs.item);
     },
 }
 </script>
