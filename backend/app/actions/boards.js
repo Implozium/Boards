@@ -84,4 +84,16 @@ module.exports = {
             })
             .then(() => true);
     },
+    archiveDoneTasks({ username, id }) {
+        return TasksList.load({ username })
+            .then((aTasksList) => {
+                const boardTasks = aTasksList.tasks.filter(aTask => aTask.boardId === id && aTask.done && !aTask.archival && aTask.type !== 'common');
+                boardTasks.forEach((aTask) => {
+                    aTask.archival = Date.now();
+                });
+
+                return aTasksList.save();
+            })
+            .then(() => true);
+    }
 };

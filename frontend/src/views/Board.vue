@@ -31,6 +31,8 @@
                     <menu-block-hr></menu-block-hr>
                     <menu-block-item @click="onConstrictBoard(activeBoardId)">сузить</menu-block-item>
                     <menu-block-hr></menu-block-hr>
+                    <menu-block-item @click="onArchiveDoneTasks(activeBoardId)">архивировать все сделанные</menu-block-item>
+                    <menu-block-hr></menu-block-hr>
                     <menu-block-item @click="onRemoveBoard(activeBoardId)">удалить</menu-block-item>
                 </menu-block>
             </template>
@@ -52,6 +54,15 @@
             </template>
             <template v-slot:footer>
                 <custom-button type="primary" @click="removeBoard(modals.removing.board.id), closeModals()">Удалить</custom-button>
+                <!-- <custom-button type="link" @click="closeModals">Отмена</custom-button> -->
+            </template>
+        </modal>
+        <modal v-if="modals.archiving.show" @hide="closeModals" type="short">
+            <template v-slot:header>
+                Вы действительно хотите архивировать все сделанные задачи для доски<br/>"<b>{{ modals.archiving.board.title }}</b>"?
+            </template>
+            <template v-slot:footer>
+                <custom-button type="primary" @click="archiveDoneTasksInBoard(modals.archiving.board.id), closeModals()">Архивировать</custom-button>
                 <!-- <custom-button type="link" @click="closeModals">Отмена</custom-button> -->
             </template>
         </modal>
@@ -122,6 +133,10 @@ export default {
                     board: null,
                     boardId: '',
                 },
+                archiving: {
+                    show: false,
+                    board: null,
+                },
             },
         };
     },
@@ -164,6 +179,10 @@ export default {
             this.modals.constricting.show = true;
             this.modals.constricting.board = this.boards.find(aBoard => aBoard.id === id);
         },
+        onArchiveDoneTasks(id) {
+            this.modals.archiving.show = true;
+            this.modals.archiving.board = this.boards.find(aBoard => aBoard.id === id);
+        },
         removeBoard(id) {
             this.closeModals();
             this.$store.dispatch('boards/remove', { id });
@@ -181,6 +200,10 @@ export default {
                 .then((res) => {
                     this.setBoard(aBoard.id);
                 });
+        },
+        archiveDoneTasksInBoard(id) {
+            this.closeModals();
+            this.$store.dispatch('boards/archiveDoneTasks', { id })
         },
         constrictBoard(id, boardId) {
             this.closeModals();

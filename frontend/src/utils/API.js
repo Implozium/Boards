@@ -32,6 +32,12 @@ const API = {
                 return true;
             });
     },
+    archiveDoneTasksInBoard(id) {
+        return Request.post(`/api/boards/${id}/actions/archive-done-tasks`, {})
+            .then((res) => {
+                return true;
+            });
+    },
     loadTasks(boardId) {
         return Request.get(`/api/tasks?board_id=${boardId}`)
             .then((tasks) => {

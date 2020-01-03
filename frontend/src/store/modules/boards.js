@@ -77,6 +77,15 @@ export default {
                     console.log(err);
                 });
         },
+        archiveDoneTasks({ commit, dispatch }, { id }) {
+            return API.archiveDoneTasksInBoard(id)
+                .then((res) => {
+                    return dispatch('tasks/load', { boardId: id }, { root: true });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        },
     },
     modules: {
     },

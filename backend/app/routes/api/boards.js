@@ -48,5 +48,13 @@ router.post('/:id/actions/constrict', (req, res, next) => {
             res.sendStatus(500);
         });
 });
+router.post('/:id/actions/archive-done-tasks', (req, res, next) => {
+    boards.archiveDoneTasks({ username: req.user.name, id: req.params.id })
+        .then(() => res.json({ result: true }))
+        .catch((err) => {
+            console.error(err);
+            res.sendStatus(500);
+        });
+});
 
 module.exports = router;

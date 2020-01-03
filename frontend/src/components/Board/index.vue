@@ -66,10 +66,10 @@
         </modal>
         <modal v-if="modals.archiving.show" @hide="closeModals" type="short">
             <template v-slot:header>
-                Вы действительно хотите архивировать задачу<br/>"<b>{{ modals.archiving.task.title }}</b>"?
+                {{ modals.archiving.task.archival ? "Вы действительно хотите снять архивирование задачи" : "Вы действительно хотите архивировать задачу"}}<br/>"<b>{{ modals.archiving.task.title }}</b>"?
             </template>
             <template v-slot:footer>
-                <custom-button type="primary" @click="archiveTask(modals.archiving.task.id), closeModals()">Архивировать</custom-button>
+                <custom-button type="primary" @click="archiveTask(modals.archiving.task.id), closeModals()">{{ modals.archiving.task.archival ? "Снять архивирование" : "Архивировать"}}</custom-button>
             </template>
         </modal>
         <modal v-if="modals.moving.show" @hide="closeModals" type="short">
@@ -330,6 +330,7 @@ export default {
             this.filters = {
                 tags: [],
                 str: '',
+                archival: false,
             };
         },
         setArchival({ value }) {
