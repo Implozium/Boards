@@ -15,13 +15,6 @@ export default {
     data: function () {
         return {};
     },
-    inject: ["addItem", "removeItem"],
-    mounted: function () {
-        this.addItem(this.$refs.item);
-    },
-    beforeDestroy: function () {
-        this.removeItem(this.$refs.item);
-    },
 }
 </script>
 

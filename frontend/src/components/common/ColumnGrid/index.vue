@@ -21,23 +21,8 @@ export default {
             timer: null,
             isFinished: true,
             items: [],
-        };
-    },
-    provide: function () {
-        return {
-            addItem: (anItem) => {
-                if (!this.items.includes(anItem)) {
-                    this.items.push(anItem);
-                }
-                this.items.sort((a, b) => +a.getAttribute("column") - +b.getAttribute("column"));
-            },
-            removeItem: (anItem) => {
-                const id = this.items.indexOf(anItem);
-                if (id !== -1) {
-                    this.items.splice(id, 1);
-                }
-                this.items.sort((a, b) => +a.getAttribute("column") - +b.getAttribute("column"));
-            },
+            resizeTimer: null,
+            observer: null,
         };
     },
     computed: {
@@ -46,14 +31,26 @@ export default {
     },
     mounted() {
         window.addEventListener('resize', this.resize);
-        this.timer = setInterval(() => {
-            this.reinit();
-        }, 100);
+        this.reinit();
+        this.observer = new MutationObserver(() => {
+            if (this.timer) {
+                clearTimeout(this.timer);
+            }
+            this.timer = setTimeout(() => {
+                this.reinit();
+            }, 100);
+        });
+        this.observer.observe(this.$el, {
+            attributes: true,
+            childList: true,
+            subtree: true
+        });
     },
     beforeDestroy() {
         window.removeEventListener('resize', this.resize);
-        clearInterval(this.timer);
+        clearTimeout(this.timer);
         this.timer = null;
+        this.observer.disconnect();
     },
     methods: {
         reinit() {
@@ -63,8 +60,8 @@ export default {
             if (this.$el.hidden === true || this.$el.offsetParent === null) {
                 return;
             }
-            // const items = Array.from(this.$el.querySelectorAll('.column-grid-item')).sort((a, b) => +a.getAttribute("column") - +b.getAttribute("column"));
-            const items = this.items;
+            const items = Array.from(this.$el.querySelectorAll('.column-grid-item')).sort((a, b) => +a.getAttribute("column") - +b.getAttribute("column"));
+            // const items = this.items;
             const infoOfColumns = items.reduce((obj, item, i) => {
                 const column = +item.getAttribute("column");
                 if (!obj[column]) {
@@ -163,7 +160,13 @@ export default {
             this.isFinished = true;
         },
         resize() {
-            this.reinit();
+            if (this.resizeTimer) {
+                clearTimeout(this.resizeTimer);
+            }
+            this.resizeTimer = setTimeout(() => {
+                this.reinit();
+                this.resizeTimer = null;
+            }, 100);
         }
     },
 }
