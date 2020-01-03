@@ -1,47 +1,49 @@
 <template>
     <div class="board">
-        <div class="board__info">
-            <div class="board__info-title">
-                <slot name="boards"></slot>
-                <template v-if="board">
-                    <div class="board__info-button"><slot name="board-menu"></slot></div>
-                </template>
-            </div>
-            <template v-if="board">
-                <div class="board__info-block">
-                    <div class="board__info-button board__info-button_add" @click="onEditTask">+ Новая задача</div>
-                    <input-text :value="filters.str" name="str" title="Поиск" @change="setTextFilter"></input-text>
-                    <div>
-                        <label><checkbox :checked="filters.archival" name="archival" @click="setArchival"/> Архивные</label>
-                    </div>
-                    <div class="board__info-tags">
-                        <tag v-for="(tag) in tags" :key="tag" :has-activing="true" @click="toggleTag(tag)" :status="filters.tags.includes(tag) ? 'actived' : 'default'">{{ tag }}</tag>
-                    </div>
+        <nav-block>
+            <template v-slot:menu>
+                <div class="board__info-title">
+                    <slot name="boards"></slot>
+                    <template v-if="board">
+                        <div class="board__info-button"><slot name="board-menu"></slot></div>
+                    </template>
                 </div>
+                <template v-if="board">
+                    <div class="board__info-block">
+                        <div class="board__info-button board__info-button_add" @click="onEditTask">+ Новая задача</div>
+                        <input-text :value="filters.str" name="str" title="Поиск" @change="setTextFilter"></input-text>
+                        <div>
+                            <label><checkbox :checked="filters.archival" name="archival" @click="setArchival"/> Архивные</label>
+                        </div>
+                        <div class="board__info-tags">
+                            <tag v-for="(tag) in tags" :key="tag" :has-activing="true" @click="toggleTag(tag)" :status="filters.tags.includes(tag) ? 'actived' : 'default'">{{ tag }}</tag>
+                        </div>
+                    </div>
+                </template>
             </template>
-        </div>
-        <div class="board__tasks" v-if="board">
-            <column-grid :minSubcolumnWidth="320">
-                <column-grid-item v-for="wrapper in wrappedTasks" :key="wrapper.task.id" :column="wrapper.column">
-                    <task
-                        :task="wrapper.task"
-                        :type="wrapper.type"
-                        @edit="onEditTask"
-                        @remove="onRemoveTask"
-                        @archive="onArchiveTask"
-                        @update="subupdateTask"
-                        @move="onMoveTask"
-                        @show="onShowTask"
-                        @expand="onExpandTask"
-                        @copy="onCopyTask"
-                        @extract="onExtractTask"
-                        @separate="onSeparateTask"
-                        @attach="onAttachTask"
-                    >
-                    </task>
-                </column-grid-item>
-            </column-grid>
-        </div>
+            <template v-slot:default v-if="board">
+                <column-grid :minSubcolumnWidth="320">
+                    <column-grid-item v-for="wrapper in wrappedTasks" :key="wrapper.task.id" :column="wrapper.column">
+                        <task
+                            :task="wrapper.task"
+                            :type="wrapper.type"
+                            @edit="onEditTask"
+                            @remove="onRemoveTask"
+                            @archive="onArchiveTask"
+                            @update="subupdateTask"
+                            @move="onMoveTask"
+                            @show="onShowTask"
+                            @expand="onExpandTask"
+                            @copy="onCopyTask"
+                            @extract="onExtractTask"
+                            @separate="onSeparateTask"
+                            @attach="onAttachTask"
+                        >
+                        </task>
+                    </column-grid-item>
+                </column-grid>
+            </template>
+        </nav-block>
         <modal v-if="modals.editing.show" @hide="closeModals" :close-on-wrap="false" type="full">
             <template v-slot:header>
                 Редактировать задачу
@@ -168,6 +170,7 @@ import InputSelect from '@/components/inputs/InputSelect.vue';
 import Checkbox from '@/components/inputs/Checkbox.vue';
 import InputText from '@/components/inputs/InputText.vue';
 import Tag from '@/components/common/Tag.vue';
+import NavBlock from '@/components/common/NavBlock.vue';
 import Task from './Task.vue';
 import Common from 'common';
 
@@ -183,6 +186,7 @@ export default {
         Tag,
         InputText,
         Checkbox,
+        NavBlock,
     },
     props: {
         "boardId": {
@@ -531,9 +535,6 @@ export default {
 <style scoped>
     .board {
         width: 100%;
-        background-color: #627a9d;
-        position: relative;
-        display: flex;
     }
     .board__showing-task {
         /* margin: 40px 0px 40px 0px; */
@@ -541,41 +542,10 @@ export default {
         /* position: relative;
         top: 40px; */
     }
-    .board__info {
-        width: 240px;
-        flex-basis: 240px;
-        border-right: 2px solid #111;
-        background-color: #2d2d2d;
-        padding-left: 8px;
-        color: #eee;
-        box-sizing: border-box;
-        position: fixed;
-        height: 100%;
-    }
     .board__info-title {
         display: flex;
         margin-bottom: 16px;
     }
-    /* .board__info-task-state {
-        line-height: 14px;
-        margin-top: 14px;
-        box-sizing: border-box;
-        border: 1px solid transparent;
-        position: relative;
-        right: -1px;
-        padding: 6px 12px;
-        cursor: pointer;
-        font-weight: 600;
-    }
-    .board__info-task-state_active {
-        color: #fdfdfd;
-        background-color:#627a9d;
-        border: 2px solid #111;
-        border-top-left-radius: 4px;
-        border-bottom-left-radius: 4px;
-        border-right: 2px solid #627a9d;
-        margin-right: -1px;
-    } */
     .board__info-block {
         margin-right: 8px;
     }
