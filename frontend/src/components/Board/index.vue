@@ -90,7 +90,7 @@
             </template>
         </modal>
         <modal v-if="modals.showing.show" @hide="closeModals" type="raw">
-            <task class="board__showing-task" :fixed="false" :actived="true" :task="modals.showing.wrappedTask.task" :type="modals.showing.wrappedTask.type"
+            <task class="board__showing-task" :fixed="false" :actived="true" :opened="true" :task="modals.showing.wrappedTask.task" :type="modals.showing.wrappedTask.type"
                 @edit="onEditTask" @remove="onRemoveTask" @archive="onArchiveTask" @update="subupdateTask" @move="onMoveTask" @show="onShowTask" @expand="onExpandTask">
             </task>
         </modal>

@@ -51,7 +51,7 @@
                     </div>
                 </div>
 
-                <div class="task__body" :class="{ 'task__body_fixed': fixed }" v-if="task.open && (task.description || task.items.length)">
+                <div class="task__body" :class="{ 'task__body_fixed': fixed }" v-if="(opened || task.open) && (task.description || task.items.length)">
                     <div class="task__description"><md-viewer :text="task.description"></md-viewer></div>
                     <ol class="task__items" v-if="task.items.length">
                         <li class="task__item" v-for="(item, i) in task.items" :key="i" :class="{ task__item_done: item.done }">
@@ -147,6 +147,10 @@ export default {
             default: true,
         },
         "actived": {
+            type: Boolean,
+            default: false,
+        },
+        "opened": {
             type: Boolean,
             default: false,
         },

@@ -159,7 +159,7 @@ export default {
         transition: all 0.3s;
     }
     .input-text__label_area {
-        background-color: white;
+        /* background-color: white; */
         top: 1px;
         width: calc(100% - 20px);
     }

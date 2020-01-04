@@ -509,8 +509,8 @@ export default {
     }
     .task-form__header-list-item {
         min-width: 280px;
-        margin-left: 20px;
-        /* flex-grow: 1; */
+        margin-left: 30px;
+        flex-grow: 1;
         margin-bottom: 20px;
     }
     /* .task-form__header-list-item + .task-form__header-list-item {
