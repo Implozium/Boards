@@ -399,7 +399,10 @@ export default {
         cursor: pointer;
     }
     .task-form__radio-type {
-        margin-right: 16px;
+        display: inline-block;
+    }
+    .task-form__radio-type + .task-form__radio-type {
+        margin-left: 16px;
     }
     .task-form__radio-type input {
         display: none;
