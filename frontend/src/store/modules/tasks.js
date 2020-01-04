@@ -59,7 +59,7 @@ export default {
     },
     actions: {
         load({ commit }, { boardId }) {
-            return API.loadTasks(boardId)
+            return API.tasks.loadAllByBoardId(boardId)
                 .then((tasks) => {
                     commit('set', { tasks });
                 })
@@ -68,7 +68,7 @@ export default {
                 });
         },
         update({ commit }, { task }) {
-            return API.updateTask(task)
+            return API.tasks.update(task)
                 .then((res) => {
                     commit('update', { task });
                 })
@@ -79,7 +79,7 @@ export default {
         subupdate({ commit, getters }, { id, options }) {
             commit('subupdate', { id, options });
             const task = getters['taskById'](id);
-            return API.updateTask(task)
+            return API.tasks.update(task)
                 .then((res) => {
                     //commit('update', task);
                 })
@@ -88,7 +88,7 @@ export default {
                 });
         },
         remove({ commit }, { id }) {
-            return API.removeTask(id)
+            return API.tasks.remove(id)
                 .then((res) => {
                     commit('remove', { id });
                 })
@@ -97,7 +97,7 @@ export default {
                 });
         },
         expand({ commit }, { id }) {
-            return API.expandTask(id)
+            return API.tasks.expand(id)
                 .then((res) => {
                     commit('remove', { id });
                 })
@@ -109,7 +109,7 @@ export default {
             commit('clear', {});
         },
         copy({ commit, getters, dispatch }, { id }) {
-            return API.copyTask(id)
+            return API.tasks.copy(id)
                 .then((res) => {
                     const task = getters['taskById'](id);
                     return dispatch('load', { boardId: task.boardId });
@@ -119,7 +119,7 @@ export default {
                 });
         },
         extract({ commit, getters, dispatch }, { id, itemsIds }) {
-            return API.extractTask(id, itemsIds)
+            return API.tasks.extract(id, itemsIds)
                 .then((res) => {
                     const task = getters['taskById'](id);
                     return dispatch('load', { boardId: task.boardId });
@@ -129,7 +129,7 @@ export default {
                 });
         },
         separate({ commit, getters, dispatch }, { id, itemsIds }) {
-            return API.separateTask(id, itemsIds)
+            return API.tasks.separate(id, itemsIds)
                 .then((res) => {
                     const task = getters['taskById'](id);
                     return dispatch('load', { boardId: task.boardId });
@@ -139,7 +139,7 @@ export default {
                 });
         },
         attach({ commit, getters, dispatch }, { id, toTaskId }) {
-            return API.attachTask(id, toTaskId)
+            return API.tasks.attach(id, toTaskId)
                 .then((res) => {
                     const task = getters['taskById'](id);
                     return dispatch('load', { boardId: task.boardId });

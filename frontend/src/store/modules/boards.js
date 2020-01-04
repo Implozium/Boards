@@ -42,7 +42,7 @@ export default {
     },
     actions: {
         load({ commit }) {
-            return API.loadBoards()
+            return API.boards.loadAll()
                 .then((boards) => {
                     commit('set', { boards });
                 })
@@ -51,7 +51,7 @@ export default {
                 });
         },
         update({ commit }, { board }) {
-            return API.updateBoard(board)
+            return API.boards.update(board)
                 .then((res) => {
                     commit('update', { board });
                 })
@@ -60,7 +60,7 @@ export default {
                 });
         },
         remove({ commit }, { id }) {
-            return API.removeBoard(id)
+            return API.boards.remove(id)
                 .then((res) => {
                     commit('remove', { id });
                 })
@@ -69,7 +69,7 @@ export default {
                 });
         },
         constrict({ commit }, { id, boardId }) {
-            return API.constrictBoard(id, boardId)
+            return API.boards.constrict(id, boardId)
                 .then((res) => {
                     commit('remove', { id });
                 })
@@ -78,7 +78,7 @@ export default {
                 });
         },
         archiveDoneTasks({ commit, dispatch }, { id }) {
-            return API.archiveDoneTasksInBoard(id)
+            return API.boards.archiveDoneTasks(id)
                 .then((res) => {
                     return dispatch('tasks/load', { boardId: id }, { root: true });
                 })

@@ -99,24 +99,33 @@ const Common = {
         const { addedMs, ms } = Common.getAddedMsAndMs(aTask.days, date.getDay(), time, (val, date) => val !== date.getDay());
 
         return {
-            isDone: Boolean(aTask.done) && dateDone.getFullYear() === now.getFullYear() && dateDone.getMonth() === now.getMonth() && dateDone.getDate() === now.getDate()
+            isDone: Boolean(aTask.done)
+                && dateDone.getFullYear() === now.getFullYear()
+                && dateDone.getMonth() === now.getMonth()
+                && dateDone.getDate() === now.getDate()
                 && aTask.days.includes(now.getDay()),
             canSetDone: aTask.days.includes(now.getDay()),
             createdAsString: Common.toDate(aTask.created),
-            fromAsString: aTask.days.length === 0 ? ''
+            fromAsString: aTask.days.length === 0
+                ? ''
                 : Common.toDate(Math.floor((date.getTime() - new Date().getTimezoneOffset() * 60 * 1000) / (24 * 60 * 60 * 1000)) * 24 * 60 * 60 * 1000
                     + addedMs + aTask.fromTime + new Date().getTimezoneOffset() * 60 * 1000),
-            toAsString: aTask.days.length === 0 ? ''
+            toAsString: aTask.days.length === 0
+                ? ''
                 : Common.toDate(Math.floor((date.getTime() - new Date().getTimezoneOffset() * 60 * 1000) / (24 * 60 * 60 * 1000)) * 24 * 60 * 60 * 1000
                     + addedMs + aTask.fromTime + aTask.length + new Date().getTimezoneOffset() * 60 * 1000),
             doneAsString: Common.toDate(aTask.done),
-            beforeFrom: aTask.days.length === 0 ? ''
+            beforeFrom: aTask.days.length === 0
+                ? ''
                 : addedMs !== 0 || aTask.fromTime > ms ? Common.stringDate(addedMs + aTask.fromTime - ms) : '',
-            afterFrom: aTask.days.length === 0 ? ''
+            afterFrom: aTask.days.length === 0
+                ? ''
                 : addedMs === 0 && aTask.fromTime < ms ? Common.stringDate(ms - aTask.fromTime) : '',
-            beforeTo: aTask.days.length === 0 ? ''
+            beforeTo: aTask.days.length === 0
+                ? ''
                 : addedMs !== 0 || aTask.fromTime + aTask.length > ms ? Common.stringDate(addedMs + aTask.fromTime + aTask.length - ms) : '',
-            afterTo: aTask.days.length === 0 ? ''
+            afterTo: aTask.days.length === 0
+                ? ''
                 : addedMs === 0 && aTask.fromTime + aTask.length < ms ? Common.stringDate(ms - aTask.fromTime - aTask.length) : '',
             allTime: aTask.length ? Common.stringDate(aTask.length) : '',
             doneTime: aTask.done ? Common.stringDate(time - aTask.done) : '',
@@ -130,24 +139,33 @@ const Common = {
         const { addedMs, ms } = Common.getAddedMsAndMs(aTask.dates, date.getDate(), time, (val, date) => val !== date.getDate());
 
         return {
-            isDone: Boolean(aTask.done) && dateDone.getFullYear() === now.getFullYear() && dateDone.getMonth() === now.getMonth() && dateDone.getDate() === now.getDate()
+            isDone: Boolean(aTask.done)
+                && dateDone.getFullYear() === now.getFullYear()
+                && dateDone.getMonth() === now.getMonth()
+                && dateDone.getDate() === now.getDate()
                 && aTask.dates.includes(now.getDate()),
             canSetDone: aTask.dates.includes(now.getDate()),
             createdAsString: Common.toDate(aTask.created),
-            fromAsString: aTask.dates.length === 0 ? ''
+            fromAsString: aTask.dates.length === 0
+                ? ''
                 : Common.toDate(Math.floor((date.getTime() - new Date().getTimezoneOffset() * 60 * 1000) / (24 * 60 * 60 * 1000)) * 24 * 60 * 60 * 1000
                     + addedMs + aTask.fromTime + new Date().getTimezoneOffset() * 60 * 1000),
-            toAsString: aTask.dates.length === 0 ? ''
+            toAsString: aTask.dates.length === 0
+                ? ''
                 : Common.toDate(Math.floor((date.getTime() - new Date().getTimezoneOffset() * 60 * 1000) / (24 * 60 * 60 * 1000)) * 24 * 60 * 60 * 1000
                     + addedMs + aTask.fromTime + aTask.length + new Date().getTimezoneOffset() * 60 * 1000),
             doneAsString: Common.toDate(aTask.done),
-            beforeFrom: aTask.dates.length === 0 ? ''
+            beforeFrom: aTask.dates.length === 0
+                ? ''
                 : addedMs !== 0 || aTask.fromTime > ms ? Common.stringDate(addedMs + aTask.fromTime - ms) : '',
-            afterFrom: aTask.dates.length === 0 ? ''
+            afterFrom: aTask.dates.length === 0
+                ? ''
                 : addedMs === 0 && aTask.fromTime < ms ? Common.stringDate(ms - aTask.fromTime) : '',
-            beforeTo: aTask.dates.length === 0 ? ''
+            beforeTo: aTask.dates.length === 0
+                ? ''
                 : addedMs !== 0 || aTask.fromTime + aTask.length > ms ? Common.stringDate(addedMs + aTask.fromTime + aTask.length - ms) : '',
-            afterTo: aTask.dates.length === 0 ? ''
+            afterTo: aTask.dates.length === 0
+                ? ''
                 : addedMs === 0 && aTask.fromTime + aTask.length < ms ? Common.stringDate(ms - aTask.fromTime - aTask.length) : '',
             allTime: aTask.length ? Common.stringDate(aTask.length) : '',
             doneTime: aTask.done ? Common.stringDate(time - aTask.done) : '',
