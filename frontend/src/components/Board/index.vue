@@ -40,7 +40,7 @@
                             :type="wrapper.type"
                             @edit="onEditTask"
                             @remove="onRemoveTask"
-                            @archive="onArchiveTask"
+                            @archive="archiveTask"
                             @update="subupdateTask"
                             @move="onMoveTask"
                             @show="onShowTask"
@@ -75,14 +75,14 @@
                 <!-- <custom-button type="link" @click="closeModals">Отмена</custom-button> -->
             </template>
         </modal>
-        <modal v-if="modals.archiving.show" @hide="closeModals" type="short">
+        <!-- <modal v-if="modals.archiving.show" @hide="closeModals" type="short">
             <template v-slot:header>
                 {{ modals.archiving.task.archival ? "Вы действительно хотите снять архивирование задачи" : "Вы действительно хотите архивировать задачу"}}<br/>"<b>{{ modals.archiving.task.title }}</b>"?
             </template>
             <template v-slot:footer>
                 <custom-button type="primary" @click="archiveTask(modals.archiving.task.id), closeModals()">{{ modals.archiving.task.archival ? "Снять архивирование" : "Архивировать"}}</custom-button>
             </template>
-        </modal>
+        </modal> -->
         <modal v-if="modals.moving.show" @hide="closeModals" type="short">
             <template v-slot:header>
                 Перемещение задачи<br/>"<b>{{ modals.moving.task.title }}</b>"?
@@ -101,8 +101,21 @@
             </template>
         </modal>
         <modal v-if="modals.showing.show" @hide="closeModals" type="raw">
-            <task class="board__showing-task" :fixed="false" :actived="true" :opened="true" :task="modals.showing.wrappedTask.task" :type="modals.showing.wrappedTask.type"
-                @edit="onEditTask" @remove="onRemoveTask" @archive="onArchiveTask" @update="subupdateTask" @move="onMoveTask" @show="onShowTask" @expand="onExpandTask">
+            <task
+                class="board__showing-task"
+                :fixed="false"
+                :actived="true"
+                :opened="true"
+                :task="modals.showing.wrappedTask.task"
+                :type="modals.showing.wrappedTask.type"
+                @edit="onEditTask"
+                @remove="onRemoveTask"
+                @archive="archiveTask"
+                @update="subupdateTask"
+                @move="onMoveTask"
+                @show="onShowTask"
+                @expand="onExpandTask"
+            >
             </task>
         </modal>
         <modal v-if="modals.expanding.show" @hide="closeModals" type="short">
@@ -220,10 +233,10 @@ export default {
                     show: false,
                     task: null,
                 },
-                archiving: {
-                    show: false,
-                    task: null,
-                },
+                // archiving: {
+                //     show: false,
+                //     task: null,
+                // },
                 moving: {
                     show: false,
                     task: null,
@@ -268,7 +281,6 @@ export default {
                 tags: [],
                 str: '',
                 timer: null,
-                archival: false,
                 type: 'active',
             }
         };
@@ -351,12 +363,8 @@ export default {
             this.filters = {
                 tags: [],
                 str: '',
-                archival: false,
                 type: 'active',
             };
-        },
-        setArchival({ value }) {
-            this.filters.archival = value;
         },
         onEditTask(id) {
             this.closeModals();
@@ -368,11 +376,11 @@ export default {
             this.modals.removing.show = true;
             this.modals.removing.task = this.tasks.find(task => task.id === id);
         },
-        onArchiveTask(id) {
-            this.closeModals();
-            this.modals.archiving.show = true;
-            this.modals.archiving.task = this.tasks.find(task => task.id === id);
-        },
+        // onArchiveTask(id) {
+        //     this.closeModals();
+        //     this.modals.archiving.show = true;
+        //     this.modals.archiving.task = this.tasks.find(task => task.id === id);
+        // },
         onMoveTask(id) {
             this.closeModals();
             this.modals.moving.show = true;
