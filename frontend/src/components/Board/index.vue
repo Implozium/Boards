@@ -12,20 +12,13 @@
                     <div class="board__info-block">
                         <div class="board__info-button board__info-button_add" @click="onEditTask">+ Новая задача</div>
                         <input-text :value="filters.str" name="str" title="Поиск" @change="setTextFilter"></input-text>
-                        <row>
-                            <label class="board__info-radio-type">
-                                <input type="radio" name="type" value="active" :checked="filters.type === 'active'" @click="filters.type = 'active'"/>
-                                <span>Активные</span>
-                            </label>
-                            <label class="board__info-radio-type">
-                                <input type="radio" name="type" value="archival" :checked="filters.type === 'archival'" @click="filters.type = 'archival'"/>
-                                <span>Архивные</span>
-                            </label>
-                            <label class="board__info-radio-type">
-                                <input type="radio" name="type" value="all" :checked="filters.type === 'all'" @click="filters.type = 'all'"/>
-                                <span>Все</span>
-                            </label>
-                        </row>
+                        <input-radio
+                            :value="filters.type"
+                            name="type"
+                            :items="[{ value: 'active', title: 'Активные' }, { value: 'archival', title: 'Архивные' }, { value: 'all', title: 'Все' }]"
+                            @change="filters.type = $event.value"
+                        >
+                        </input-radio>
                         <div class="board__info-tags">
                             <tag v-for="(tag) in tags" :key="tag" :has-activing="true" @click="toggleTag(tag)" :status="filters.tags.includes(tag) ? 'actived' : 'default'">{{ tag }}</tag>
                         </div>
@@ -191,6 +184,7 @@ import ColumnGrid from '@/components/common/ColumnGrid';
 import ColumnGridItem from '@/components/common/ColumnGrid/ColumnGridItem.vue';
 import CustomButton from '@/components/common/CustomButton.vue';
 import InputSelect from '@/components/inputs/InputSelect.vue';
+import InputRadio from '@/components/inputs/InputRadio.vue';
 import Checkbox from '@/components/inputs/Checkbox.vue';
 import InputText from '@/components/inputs/InputText.vue';
 import Tag from '@/components/common/Tag.vue';
@@ -215,6 +209,7 @@ export default {
         NavBlock,
         Column,
         Row,
+        InputRadio,
     },
     props: {
         "boardId": {
@@ -606,40 +601,5 @@ export default {
     .board__tasks {
         flex-grow: 1;
         margin-left: 240px;
-    }
-
-    .board__info-radio-type {
-        display: inline-block;
-        flex-grow: 1;
-    }
-    .board__info-radio-type + .board__info-radio-type {
-        margin-left: 4px;
-    }
-    .board__info-radio-type input {
-        display: none;
-    }
-    .board__info-radio-type span {
-        cursor: pointer;
-        padding: 2px 4px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background-color: #fff;
-        color: #888;
-        transition: all 0.3s;
-        display: inline-block;
-        width: 100%;
-        box-sizing: border-box;
-        text-align: center;
-    }
-    .board__info-radio-type span:hover {
-        color: #333;
-        border: 1px solid #355079;
-    }
-    .board__info-radio-type input:checked + span {
-        background-color: #61affe;
-        color: #fff;
-    }
-    .board__info-radio-type input:checked + span:hover {
-        background-color: #1486f8;
     }
 </style>
