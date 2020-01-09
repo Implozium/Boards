@@ -155,4 +155,17 @@ export default {
     .body_modaled {
         overflow: hidden;
     }
+
+    @media screen and (max-width: 768px) {
+        .modal__container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            width: auto;
+            border-radius: 0px;
+            overflow-y: scroll;
+        }
+    }
 </style>
