@@ -1,5 +1,5 @@
 <template>
-    <div class="input-radio">
+    <div class="input-radio" :class="{ ['input-radio_' + type]: true }">
         <label class="input-radio__item" v-for="item in items" :key="item.value">
             <input type="radio" :name="name" :value="item.value" :checked="item.value === val" @click="onChange"/>
             <span>{{ item.title }}</span>
@@ -32,6 +32,11 @@ export default {
         "error": {
             type: String,
             default: '',
+        },
+        "type": {
+            type: String,
+            default: 'horizontal',
+            validator: (val) => ['vertical', 'horizontal'].includes(val),
         },
     },
     data: function () {
@@ -68,12 +73,25 @@ export default {
     .input-radio {
         display: flex;
     }
+    .input-radio_horizontal {
+        flex-direction: row;
+        margin-left: -4px;
+        flex-wrap: wrap;
+        margin-top: -4px;
+    }
+    .input-radio_vertical {
+        flex-direction: column;
+    }
     .input-radio__item {
         display: inline-block;
         flex-grow: 1;
     }
-    .input-radio__item + .input-radio__item {
+    .input-radio_horizontal .input-radio__item {
         margin-left: 4px;
+        margin-top: 4px;
+    }
+    .input-radio_vertical .input-radio__item + .input-radio__item {
+        margin-top: 4px;
     }
     .input-radio__item input {
         display: none;
