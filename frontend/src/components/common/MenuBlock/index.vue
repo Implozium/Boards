@@ -3,7 +3,7 @@
         <div class="menu-block__main-button" :class="{ active: active }" @click="click">
             <slot name="main"></slot>
         </div>
-        <div class="menu-block__buttons" :class="{ ['menu-block__buttons_' + type]: true }">
+        <div v-if="active" class="menu-block__buttons" :class="{ ['menu-block__buttons_' + type]: true }">
             <slot></slot>
         </div>
     </div>
