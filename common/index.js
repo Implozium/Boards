@@ -1,3 +1,5 @@
+// @ts-check
+
 const Common = {
     makeGuid() {
         return [
@@ -207,6 +209,21 @@ const Common = {
             id: params.id || Common.makeGuid(),
             tags: params.tags ? params.tags.concat() : [],
             created: params.created || Date.now(),
+        };
+    },
+    makeBookmark(params = {}) {
+        return {
+            title: params.title || '',
+            theme: params.theme || '',
+            description: params.description || '',
+            archival: params.archival || 0,
+            created: params.created || Date.now(),
+            seen: params.seen || Date.now(),
+            tags: params.tags ? params.tags.concat() : [],
+            href: params.href || '',
+            chosen: params.chosen !== undefined ? params.chosen : false,
+            id: params.id || Common.makeGuid(),
+            state: params.state || 'new',
         };
     },
     stringDate(number, offset = 1, numberOfParts = 2) {

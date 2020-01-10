@@ -1,15 +1,15 @@
 <template>
-    <div class="board">
-        <board></board>
+    <div class="bookmarks">
+        <bookmarks></bookmarks>
     </div>
 </template>
 
 <script>
-import Board from '@/components/Board';
+import Bookmarks from '@/components/Bookmarks';
 
 export default {
     components: {
-        Board,
+        Bookmarks,
     },
     data: function () {
         return {
@@ -27,7 +27,7 @@ export default {
 </script>
 
 <style scoped>
-    .board {
+    .bookmarks {
         height: 100%;
     }
 </style>

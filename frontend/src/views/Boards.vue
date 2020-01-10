@@ -1,15 +1,15 @@
 <template>
-    <div class="board">
-        <board></board>
+    <div class="boards">
+        <boards></boards>
     </div>
 </template>
 
 <script>
-import Board from '@/components/Board';
+import Boards from '@/components/Boards';
 
 export default {
     components: {
-        Board,
+        Boards,
     },
     data: function () {
         return {
@@ -27,7 +27,7 @@ export default {
 </script>
 
 <style scoped>
-    .board {
+    .boards {
         height: 100%;
     }
 </style>

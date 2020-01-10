@@ -46,7 +46,7 @@ module.exports = class BoardsList extends Entity {
     };
 
     static loadFromStorage(params) {
-        return jsonfile.load(BoardsList.getFileName(params.username))
+        return jsonfile.load(BoardsList.getFileName(params.username), [])
             .then((data) => {
                 return {
                     username: params.username,

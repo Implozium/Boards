@@ -1,16 +1,38 @@
 <template>
     <div class="board">
-        <nav-block>
+        <nav-block title="Доски и задачи">
             <template v-slot:menu>
-                <div class="board__info-title">
-                    <slot name="boards"></slot>
-                    <template v-if="board">
-                        <div class="board__info-button"><slot name="board-menu"></slot></div>
-                    </template>
-                </div>
+                <nav-block-group>
+                    <div class="board__info-title">
+                        <menu-block class="board__boards" type="none">
+                            <template v-slot:main>
+                                <div
+                                    class="board__boards-head"
+                                    :class="{ 'board__boards-head_empty': !activeBoard }"
+                                    :title="activeBoard ? activeBoard.description : 'Не выбрано доски'"
+                                >{{ activeBoard ? '➜ ' + activeBoard.title : 'Не выбрано доски' }}</div>
+                            </template>
+                            <menu-block-item
+                                v-for="aBoard in boards"
+                                :key="aBoard.id"
+                                :status="aBoard.id === boardId ? 'disabled' : 'default'"
+                                :title="aBoard.description || ''"
+                                @click="setBoard(aBoard.id)"
+                            >
+                                <div class="board__boards-item-title">{{ aBoard.title }}</div>
+                                <div class="board__boards-item-description">{{ aBoard.description }}</div>
+                            </menu-block-item>
+                        </menu-block>
+                        <template v-if="board">
+                            <div class="board__info-button"><slot name="board-menu"></slot></div>
+                        </template>
+                    </div>
+                </nav-block-group>
                 <template v-if="board">
-                    <div class="board__info-block">
+                    <nav-block-group>
                         <div class="board__info-button board__info-button_add" @click="onEditTask">+ Новая задача</div>
+                    </nav-block-group>
+                    <nav-block-group title="Фильтрация по">
                         <input-text :value="filters.str" name="str" title="Поиск" @change="setTextFilter"></input-text>
                         <input-radio
                             :value="filters.type"
@@ -19,10 +41,11 @@
                             @change="filters.type = $event.value"
                         >
                         </input-radio>
+                        <br/>
                         <div class="board__info-tags">
                             <tag v-for="(tag) in tags" :key="tag" :has-activing="true" @click="toggleTag(tag)" :status="filters.tags.includes(tag) ? 'actived' : 'default'">{{ tag }}</tag>
                         </div>
-                    </div>
+                    </nav-block-group>
                 </template>
             </template>
             <template v-slot:default v-if="board">
@@ -188,10 +211,13 @@ import InputRadio from '@/components/inputs/InputRadio.vue';
 import Checkbox from '@/components/inputs/Checkbox.vue';
 import InputText from '@/components/inputs/InputText.vue';
 import Tag from '@/components/common/Tag.vue';
-import NavBlock from '@/components/common/NavBlock.vue';
+import NavBlock from '@/components/common/NavBlock';
+import NavBlockGroup from '@/components/common/NavBlock/NavBlockGroup';
 import Column from '@/components/common/Column';
 import Row from '@/components/common/Row';
 import Task from './Task.vue';
+import MenuBlock from '@/components/common/MenuBlock';
+import MenuBlockItem from '@/components/common/MenuBlock/MenuBlockItem';
 import Common from 'common';
 
 export default {
@@ -210,14 +236,15 @@ export default {
         Column,
         Row,
         InputRadio,
+        NavBlockGroup,
+        MenuBlock,
+        MenuBlockItem,
     },
     props: {
-        "boardId": {
-            type: String
-        }
     },
     data() {
         return {
+            boardId: this.$route.params.id,
             time: Date.now(),
             modals: {
                 editing: {
@@ -286,6 +313,9 @@ export default {
         },
         boards() {
             return this.$store.getters['boards/boards'];
+        },
+        activeBoard() {
+            return this.boards.find(aBoard => aBoard.id === this.boardId);
         },
         tasks() {
             return this.$store.getters['tasks/tasksByBoardId'](this.boardId);
@@ -553,7 +583,11 @@ export default {
             // this.filters.timer = setTimeout(() => {
             //     this.filters.str = value;
             // }, 300);
-        }
+        },
+        setBoard(id) {
+            this.boardId = id || null;
+            this.$router.push({ name: 'board', params: { id } });
+        },
     },
 }
 </script>
@@ -572,9 +606,6 @@ export default {
         display: flex;
         margin-bottom: 16px;
     }
-    .board__info-block {
-        margin-right: 8px;
-    }
     .board__info-button {
         align-self: center;
     }
@@ -588,7 +619,6 @@ export default {
         cursor: pointer;
         transition: all 0.3s;
         color: #666;
-        margin: 18px 0px 18px 0px;
     }
     .board__info-button_add:hover {
         border: 2px solid #888;
@@ -601,5 +631,44 @@ export default {
     .board__tasks {
         flex-grow: 1;
         margin-left: 240px;
+    }
+    .board__boards {
+        top: 6px;
+        width: 100%;
+    }
+    .board__boards-head {
+        line-height: 26px;
+        font-size: 16px;
+        font-weight: 500;
+        padding: 0px 8px;
+        background-color: white;
+        border: 1px solid #eee;
+        color: #eee;
+        border-radius: 2px;
+        cursor: pointer;
+        /* max-width: 200px; */
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        min-height: 28px;
+        white-space: pre;
+        /* min-width: 200px; */
+        box-sizing: border-box;
+        background-color: #355079;
+        transition: all 0.3s;
+    }
+    .board__boards-head:hover {
+        border: 1px solid #355079;
+        background-color: #5682c5;
+    }
+    .board__boards-head_empty {
+        color: #888;
+        font-size: 16px;
+    }
+    .board__boards-item-title {
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .board__boards-item-description {
+        font-size: 12px;
     }
 </style>

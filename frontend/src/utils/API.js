@@ -90,6 +90,32 @@ const API = {
                 });
         },
     },
+    bookmarks: {
+        loadAll() {
+            return Request.get('/api/bookmarks')
+                .then((bookmarks) => {
+                    return bookmarks.map(Common.makeBookmark);
+                });
+        },
+        load(id) {
+            return Request.get(`/api/bookmarks/${id}`)
+                .then((bookmark) => {
+                    return bookmark ? Common.makeBookmark(bookmark) : null;
+                });
+        },
+        update(aBookmark) {
+            return Request.post(`/api/bookmarks/${aBookmark.id}`, aBookmark)
+                .then((res) => {
+                    return true;
+                });
+        },
+        remove(id) {
+            return Request.post(`/api/bookmarks/${id}/actions/delete`, {})
+                .then((res) => {
+                    return true;
+                });
+        },
+    },
 };
 
 export default API;

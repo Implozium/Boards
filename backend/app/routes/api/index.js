@@ -13,5 +13,6 @@ router.use(auth.loggedIn, (req, res, next) => {
 
 router.use('/boards', require('./boards'));
 router.use('/tasks', require('./tasks'));
+router.use('/bookmarks', require('./bookmarks'));
 
 module.exports = router;

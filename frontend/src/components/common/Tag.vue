@@ -28,6 +28,7 @@ export default {
         border: 2px solid #4747eb;
         height: 18px;
         line-height: 14px;
+        font-size: 14px;
         margin-right: 6px;
         padding: 0 6px 0 6px;
         border-radius: 8px;

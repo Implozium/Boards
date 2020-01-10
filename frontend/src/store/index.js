@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 
 import boards from './modules/boards';
 import tasks from './modules/tasks';
+import bookmarks from './modules/bookmarks';
 
 Vue.use(Vuex);
 
@@ -21,6 +22,7 @@ export default new Vuex.Store({
     modules: {
         boards: boards,
         tasks: tasks,
+        bookmarks: bookmarks,
     },
     strict: debug,
 });

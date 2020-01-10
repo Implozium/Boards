@@ -336,7 +336,7 @@ export default {
             }
         },
         openDescription(i) {
-            this.openedDescriptionsOfItems.splice(i, 1, true);
+            this.$set(this.openedDescriptionsOfItems, i, true);
         },
         onAddTag(event) {
             const {

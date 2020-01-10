@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Board from './views/Board.vue';
+import Boards from './views/Boards.vue';
+import Bookmarks from './views/Bookmarks.vue';
 
 Vue.use(VueRouter);
 
@@ -9,9 +11,19 @@ export default new VueRouter({
     base: process.env.BASE_URL,
     routes: [
         {
-            path: '/board/:id?',
+            path: '/boards',
+            name: 'boards',
+            component: Boards,
+        },
+        {
+            path: '/boards/:id?',
             name: 'board',
             component: Board,
+        },
+        {
+            path: '/bookmarks',
+            name: 'bookmarks',
+            component: Bookmarks,
         },
         // {
         //     path: '/about',

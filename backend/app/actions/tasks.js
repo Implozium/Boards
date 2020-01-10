@@ -146,7 +146,7 @@ module.exports = {
                     return true;
                 }
                 if (aTask.description) {
-                    toTask.description += toTask.description ? '\n\n---\n\n' : '';
+                    toTask.description += toTask.description ? `\n\n${aTask.title}\n${'='.repeat(aTask.title.length)}\n\n` : '';
                     toTask.description += aTask.description;
                 }
                 toTask.tags = toTask.tags.concat(aTask.tags.filter(tag => !toTask.tags.includes(tag)));

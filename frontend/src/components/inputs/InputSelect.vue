@@ -9,7 +9,7 @@
             @focus="onFocus"
             @blur="onBlur"
         >
-            <option v-for="item in items" class="input-select__option" :key="item.value" :value="item.value">{{ item.title }}</option>
+            <option v-for="item in items" class="input-select__option" :key="item.value" :value="item.value" :disabled="item.disabled === true">{{ item.title }}</option>
         </select>
         <div class="input-select__footer">
             <div class="input-select__error" v-if="err">{{ err }}</div>

@@ -70,7 +70,7 @@
                 <div class="task__footer" v-else-if="!taskInfo.isDone && type === 'future' && taskInfo.beforeFrom">{{ taskInfo.beforeFrom }}</div>-->
             </div>
 
-            <div :hidden="!active && !actived" class="task__info" :class="{ ['task__info_' + position]: true }">
+            <div v-if="active || actived" class="task__info" :class="{ ['task__info_' + position]: true }">
                 <div class="task__info-item" v-if="task.from || task.to || taskInfo.allTime || taskInfo.doneTime">
                     <template v-if="taskInfo.fromAsString">
                         <div class="task__info-item-title">Начало:</div>
@@ -161,7 +161,7 @@ export default {
             timer: null,
             unclickTask: null,
             active: false,
-            ignoreClick: false,
+            ignoreClick: false, // необходим для нажатия просмотра
             position: "right",
         };
     },
@@ -182,9 +182,6 @@ export default {
         this.unclickTask = (event) => {
             if (!this.$refs.task.contains(event.target) && this.active) {
                 this.active = false;
-                if (this.$refs.task.closest('.column-grid-item')) {
-                    this.$refs.task.closest('.column-grid-item').style.zIndex = 1;
-                }
             }
         };
         document.addEventListener('click', this.unclickTask);
@@ -198,10 +195,6 @@ export default {
         deactivate() {
             this.active = false;
             this.ignoreClick = true;
-            // hack
-            if (this.$refs.task.closest('.column-grid-item')) {
-                this.$refs.task.closest('.column-grid-item').style.zIndex = 1;
-            }
         },
         handleItem(event) {
             const {
@@ -270,10 +263,6 @@ export default {
                 const bordersOfBody = document.body.getBoundingClientRect();
                 this.position = bordersOfBody.width - bordersOfTask.right > bordersOfTask.left ? "right" : "left";
                 this.active = true;
-                // hack
-                if (this.$refs.task.closest('.column-grid-item')) {
-                    this.$refs.task.closest('.column-grid-item').style.zIndex = 100;
-                }
             }
             this.ignoreClick = false;
         }
@@ -502,6 +491,10 @@ export default {
     }
     .task__title-info-item_archival::before {
         border-color: #a0a0a0;
+        content: '🕮';
+        font-size: 10px;
+        padding-left: 2px;
+        padding-top: 1px;
     }
     .task__buttons {
         display: flex;
@@ -569,6 +562,7 @@ export default {
         white-space: pre-wrap;
         word-break: break-word;
         font-size: 12px;
+        margin-bottom: 8px;
     }
     .task__item_done .task__item-title span {
         text-decoration: line-through;

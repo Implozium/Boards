@@ -46,7 +46,7 @@ module.exports = class TasksList extends Entity {
     };
 
     static loadFromStorage(params) {
-        return jsonfile.load(TasksList.getFileName(params.username))
+        return jsonfile.load(TasksList.getFileName(params.username), [])
             .then((data) => {
                 return {
                     username: params.username,
