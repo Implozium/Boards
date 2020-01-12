@@ -10,7 +10,7 @@
             <tag v-for="(tag) in tags" :key="tag" :has-deleting="true" @click="onRemoveTag(tag)">{{ tag }}</tag>
         </row>
         <row>
-            <input-text :name="''" :value="''" :title="'Новый тег ' + (tags.length + 1)" @change="onAddTag" type="short"></input-text>
+            <input-text :name="'tag' + tags.length" :value="''" :title="'Новый тег ' + (tags.length + 1)" @change="onAddTag" type="short"></input-text>
         </row>
         <row>
             <column>
