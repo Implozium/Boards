@@ -7,6 +7,7 @@
                 </nav-block-group>
                 <nav-block-group title="Фильтрация по">
                     <input-text :value="filters.str" name="str" title="Поиск" @change="setTextFilter"></input-text>
+                    <input-select name="theme" :value="filters.theme" title="Тема" :items="themes" @change="filters.theme = $event.value"></input-select>
                     <input-radio
                         :value="filters.type"
                         name="type"
@@ -133,7 +134,8 @@ export default {
                 str: '',
                 timer: null,
                 type: 'active',
-                state: '*'
+                state: '*',
+                theme: '*',
             },
             groupBy: 'seen',
             daysOfWeek: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
@@ -148,7 +150,7 @@ export default {
                     value: 'created',
                     title: 'Дате создания',
                     comparator: (aBookmark, bBookmark) => bBookmark.created - aBookmark.created,
-                    getGroup: (aBookmark) => new Date(aBookmark.created).toISOString().split('T')[0] + ' ' + this.daysOfWeek[new Date(aBookmark.seen).getDay()],
+                    getGroup: (aBookmark) => new Date(aBookmark.created).toISOString().split('T')[0] + ' ' + this.daysOfWeek[new Date(aBookmark.created).getDay()],
                 },
                 {
                     value: 'theme',
@@ -238,6 +240,9 @@ export default {
                     if (this.filters.state !== '*') {
                         has = has && aBookmark.state === this.filters.state;
                     }
+                    if (this.filters.theme !== '*') {
+                        has = has && aBookmark.theme === this.filters.theme;
+                    }
                     return has;
                 })
                 .sort((aBookmark, bBookmark) => aBookmark.chosen && bBookmark.chosen
@@ -300,6 +305,18 @@ export default {
                 }, [])
                 .sort((a, b) => a.localeCompare(b));;
         },
+        "themes": function () {
+            const themes = this.$store.getters['bookmarks/bookmarks']
+                .map(aBookmark => aBookmark.theme)
+                .filter((theme, i, arr) => arr.indexOf(theme) === i)
+                .map(theme => ({ value: theme, title: theme }))
+                .sort((aTheme, bTheme) => aTheme.value.localeCompare(bTheme.value));
+            themes.unshift(
+                { value: '*', title: 'Все' },
+                { value: '---', title: '---', disabled: true }
+            );
+            return themes;
+        }
     },
     watch: {
     },
@@ -315,6 +332,7 @@ export default {
                 str: '',
                 type: 'active',
                 state: '*',
+                theme: '*',
             };
         },
         onEditBookmark(id) {
