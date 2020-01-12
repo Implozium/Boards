@@ -181,21 +181,15 @@ export default {
         },
         updateBoard(aBoard) {
             this.closeModals();
-            this.$store.dispatch('boards/update', { board: aBoard })
-                .then((res) => {
-                    this.setBoard(aBoard.id);
-                });
+            this.$store.dispatch('boards/update', { board: aBoard });
         },
         archiveDoneTasksInBoard(id) {
             this.closeModals();
-            this.$store.dispatch('boards/archiveDoneTasks', { id })
+            this.$store.dispatch('boards/archiveDoneTasks', { id });
         },
         constrictBoard(id, boardId) {
             this.closeModals();
-            this.$store.dispatch('boards/constrict', { id, boardId })
-                .then((res) => {
-                    this.setBoard(boardId);
-                });
+            this.$store.dispatch('boards/constrict', { id, boardId });
         },
         onChangeInConstricting(event) {
             const {
