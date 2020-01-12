@@ -180,7 +180,7 @@
                 <custom-button type="primary" @click="separateTask(modals.separating.task.id, modals.separating.itemsIds), closeModals()">Разделить (переместить)</custom-button>
             </template>
         </modal>
-        <modal v-if="modals.attaching.show" @hide="closeModals" type="short">
+        <modal v-if="modals.attaching.show" @hide="closeModals" type="medium">
             <template v-slot:header>
                 Слияние задачи<br/>"<b>{{ modals.attaching.task.title }}</b>"?
             </template>
@@ -189,7 +189,7 @@
                     name="toTaskId"
                     title="Задача к которой присоединится эта задача"
                     :value="modals.attaching.toTaskId"
-                    :items="tasks.filter(aTask => aTask.id !== modals.attaching.task.id).map(aTask => ({ title: aTask.title, value: aTask.id }))"
+                    :items="modals.attaching.toTaskItems"
                     @change="modals.attaching.toTaskId = $event.value"
                 ></input-select>
             </template>
@@ -286,6 +286,7 @@ export default {
                     show: false,
                     task: null,
                     toTaskId: null,
+                    toTaskItems: [],
                 },
             },
             timer: null,
@@ -451,7 +452,15 @@ export default {
             }
             this.modals.attaching.show = true;
             this.modals.attaching.task = this.tasks.find(task => task.id === id);
-            this.modals.attaching.toTaskId = this.tasks.find(task => task.id !== id).id;
+            const tasks = this.tasks.filter((aTask) => {
+                return aTask.id !== id && (
+                    this.filters.type === 'active' && !aTask.archival
+                    || this.filters.type === 'archival' && aTask.archival
+                    || this.filters.type === 'all'
+                );
+            });
+            this.modals.attaching.toTaskId = tasks.find(task => task.id !== id).id;
+            this.modals.attaching.toTaskItems = tasks.map(aTask => ({ title: aTask.title, value: aTask.id }));
         },
         closeModals() {
             Object.keys(this.modals).forEach(key => this.modals[key].show = false);
