@@ -2,6 +2,7 @@
 node_modules
 /dist
 /storage/
+/design/
 
 # local env files
 .env.local

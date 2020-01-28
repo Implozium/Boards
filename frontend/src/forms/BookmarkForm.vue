@@ -32,14 +32,14 @@
 </template>
 
 <script>
-import InputText from '@/components/inputs/InputText.vue';
-import InputTextDatetime from '@/components/inputs/InputTextDatetime.vue';
-import InputTextTime from '@/components/inputs/InputTextTime.vue';
-import InputSelect from '@/components/inputs/InputSelect.vue';
-import Column from '@/components/common/Column.vue';
-import Row from '@/components/common/Row.vue';
-import CustomButton from '@/components/common/CustomButton.vue';
-import Tag from '@/components/common/Tag.vue';
+import InputText from '@/components/inputs/InputText';
+import InputTextDatetime from '@/components/inputs/InputTextDatetime';
+import InputTextTime from '@/components/inputs/InputTextTime';
+import InputSelect from '@/components/inputs/InputSelect';
+import Column from '@/components/common/Column';
+import Row from '@/components/common/Row';
+import CustomButton from '@/components/common/CustomButton';
+import Tag from '@/components/common/Tag';
 import Common from 'common';
 
 export default {

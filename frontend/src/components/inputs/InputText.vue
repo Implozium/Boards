@@ -151,7 +151,8 @@ export default {
         color: grey;
         font-size: 14px;
         width: 100%;
-        padding: 20px 12px 4px 12px;
+        padding: 20px 12px 0px 12px;
+        margin-bottom: 4px;
         box-sizing: border-box;
         top: -2px;
         left: 2px;
@@ -159,7 +160,7 @@ export default {
         transition: all 0.3s;
     }
     .input-text__label_area {
-        /* background-color: white; */
+        background-color: white;
         top: 1px;
         width: calc(100% - 20px);
     }

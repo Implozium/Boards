@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import InputText from './InputText.vue';
+import InputText from './InputText';
 import Common from 'common';
 
 export default {

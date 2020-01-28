@@ -1,5 +1,5 @@
 import Common from 'common';
-import Request from './Request.js';
+import Request from './Request';
 
 const API = {
     boards: {
@@ -77,8 +77,8 @@ const API = {
                     return true;
                 });
         },
-        separate(id, itemsIds) {
-            return Request.post(`/api/tasks/${id}/actions/separate`, { itemsIds })
+        separate(id, itemsIds, toTaskId) {
+            return Request.post(`/api/tasks/${id}/actions/separate`, { itemsIds, toTaskId })
                 .then((res) => {
                     return true;
                 });

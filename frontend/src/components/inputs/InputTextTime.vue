@@ -2,7 +2,7 @@
     <input-text v-on="$listeners" v-bind="$attrs" :transformFrom="transformFrom" :transformTo="transformTo" :validators="[checkTime]"></input-text>
 </template>
 <script>
-import InputText from './InputText.vue';
+import InputText from './InputText';
 
 export default {
     components: {

@@ -3,7 +3,7 @@
         <nav-block title="Закладки" active="bookmarks">
             <template v-slot:menu>
                 <nav-block-group>
-                    <div class="bookmarks__info-button bookmarks__info-button_add" @click="onEditBookmark">+ Новая закладка</div>
+                    <div class="bookmarks__info-button" @click="onEditBookmark">+ Новая закладка</div>
                 </nav-block-group>
                 <nav-block-group title="Фильтрация по">
                     <input-text :value="filters.str" name="str" title="Поиск" @change="setTextFilter"></input-text>
@@ -27,6 +27,8 @@
                     <div class="bookmarks__info-tags">
                         <tag v-for="(tag) in tags" :key="tag" :has-activing="true" @click="toggleTag(tag)" :status="filters.tags.includes(tag) ? 'actived' : 'default'">{{ tag }}</tag>
                     </div>
+                    <br/>
+                    <div v-if="isFilters" class="bookmarks__info-button" @click="resetFilter">Сбросить фильтры</div>
                 </nav-block-group>
                 <nav-block-group title="Сортировка по">
                     <input-radio
@@ -39,7 +41,7 @@
                     </input-radio>
                 </nav-block-group>
             </template>
-            <column-grid :minSubcolumnWidth="320">
+            <column-grid :minSubcolumnWidth="240">
                 <column-grid-item v-for="item in items" :key="item.id" :column="0" :type="item.type === 'full' ? 'full' : ''">
                     <div class="bookmarks__info-title" v-if="item.type === 'full'">{{ item.title }}</div>
                     <bookmark
@@ -80,16 +82,16 @@
 </template>
 
 <script>
-import BookmarkForm from '@/forms/BookmarkForm.vue';
-import Modal from '@/components/common/Modal.vue';
+import BookmarkForm from '@/forms/BookmarkForm';
+import Modal from '@/components/common/Modal';
 import ColumnGrid from '@/components/common/ColumnGrid';
-import ColumnGridItem from '@/components/common/ColumnGrid/ColumnGridItem.vue';
-import CustomButton from '@/components/common/CustomButton.vue';
-import InputSelect from '@/components/inputs/InputSelect.vue';
-import InputRadio from '@/components/inputs/InputRadio.vue';
-import Checkbox from '@/components/inputs/Checkbox.vue';
-import InputText from '@/components/inputs/InputText.vue';
-import Tag from '@/components/common/Tag.vue';
+import ColumnGridItem from '@/components/common/ColumnGrid/ColumnGridItem';
+import CustomButton from '@/components/common/CustomButton';
+import InputSelect from '@/components/inputs/InputSelect';
+import InputRadio from '@/components/inputs/InputRadio';
+import Checkbox from '@/components/inputs/Checkbox';
+import InputText from '@/components/inputs/InputText';
+import Tag from '@/components/common/Tag';
 import NavBlock from '@/components/common/NavBlock';
 import NavBlockGroup from '@/components/common/NavBlock/NavBlockGroup';
 import Column from '@/components/common/Column';
@@ -129,14 +131,7 @@ export default {
                     bookmark: null,
                 },
             },
-            filters: {
-                tags: [],
-                str: '',
-                timer: null,
-                type: 'active',
-                state: '*',
-                theme: '*',
-            },
+            filters: this.getDefaultFilter(),
             groupBy: 'seen',
             daysOfWeek: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
             groups: [
@@ -144,13 +139,19 @@ export default {
                     value: 'seen',
                     title: 'Дате просмотра',
                     comparator: (aBookmark, bBookmark) => bBookmark.seen - aBookmark.seen,
-                    getGroup: (aBookmark) => new Date(aBookmark.seen).toISOString().split('T')[0] + ' ' + this.daysOfWeek[new Date(aBookmark.seen).getDay()],
+                    getGroup: (aBookmark) => {
+                        const date = new Date(aBookmark.seen);
+                        return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + this.daysOfWeek[date.getDay()];
+                    },
                 },
                 {
                     value: 'created',
                     title: 'Дате создания',
                     comparator: (aBookmark, bBookmark) => bBookmark.created - aBookmark.created,
-                    getGroup: (aBookmark) => new Date(aBookmark.created).toISOString().split('T')[0] + ' ' + this.daysOfWeek[new Date(aBookmark.created).getDay()],
+                    getGroup: (aBookmark) => {
+                        const date = new Date(aBookmark.created);
+                        return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + this.daysOfWeek[date.getDay()];
+                    },
                 },
                 {
                     value: 'theme',
@@ -211,6 +212,9 @@ export default {
         bookmarks() {
             return this.$store.getters['bookmarks/bookmarks'];
         },
+        isFilters() {
+            return JSON.stringify(this.filters) !== JSON.stringify(this.getDefaultFilter());
+        },
         items() {
             const bookmarks = this.bookmarks
                 .filter((aBookmark) => {
@@ -246,7 +250,7 @@ export default {
                     return has;
                 })
                 .sort((aBookmark, bBookmark) => aBookmark.chosen && bBookmark.chosen
-                    ? aBookmark.seen - bBookmark.seen
+                    ? bBookmark.seen - aBookmark.seen
                     : aBookmark.chosen
                         ? -1
                         : bBookmark.chosen
@@ -305,7 +309,7 @@ export default {
                 }, [])
                 .sort((a, b) => a.localeCompare(b));;
         },
-        "themes": function () {
+        themes() {
             const themes = this.$store.getters['bookmarks/bookmarks']
                 .map(aBookmark => aBookmark.theme)
                 .filter((theme, i, arr) => arr.indexOf(theme) === i)
@@ -326,14 +330,17 @@ export default {
     beforeDestroy() {
     },
     methods: {
-        resetFilter() {
-            this.filters = {
+        getDefaultFilter() {
+            return {
                 tags: [],
                 str: '',
                 type: 'active',
                 state: '*',
                 theme: '*',
             };
+        },
+        resetFilter() {
+            this.filters = this.getDefaultFilter();
         },
         onEditBookmark(id) {
             this.closeModals();
@@ -417,8 +424,6 @@ export default {
     }
     .bookmarks__info-button {
         align-self: center;
-    }
-    .bookmarks__info-button_add {
         border: 2px solid #444;
         border-radius: 4px;
         padding: 4px 12px;
@@ -429,7 +434,7 @@ export default {
         transition: all 0.3s;
         color: #666;
     }
-    .bookmarks__info-button_add:hover {
+    .bookmarks__info-button:hover {
         border: 2px solid #888;
         color: #000;
     }

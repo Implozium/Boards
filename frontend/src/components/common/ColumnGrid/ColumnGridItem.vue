@@ -14,7 +14,7 @@ export default {
         "type": {
             type: String,
             default: '',
-            validator: (val) => ['', 'full', 'nex'].includes(val),
+            validator: (val) => ['', 'full', 'new'].includes(val),
         },
     },
     data: function () {

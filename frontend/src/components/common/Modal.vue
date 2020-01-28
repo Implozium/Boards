@@ -5,6 +5,7 @@
             <div class="modal__container" :class="{ ['modal__container_' + type]: true }">
                 <template v-if="type === 'raw'">
                     <slot></slot>
+                    <div class="modal__raw-close" @click="$emit('hide')">×</div>
                 </template>
                 <template v-else>
                     <div class="modal__header">
@@ -107,7 +108,7 @@ export default {
         width: 400px;
     }
     .modal__container_raw {
-        max-width: 600px;
+        max-width: 1200px;
     }
     .modal__container_full {
         width: calc(100% - 50px);
@@ -131,6 +132,20 @@ export default {
         color: grey;
         transition: color 0.3s;
         cursor: pointer;
+    }
+    .modal__raw-close {
+        font-size: 28px;
+        color: #fff;
+        transition: color 0.3s;
+        cursor: pointer;
+        margin: 10px;
+        box-sizing: border-box;
+        border: 2px solid #fff;
+        border-radius: 12px;
+        text-align: center;
+        font-weight: bolder;
+        background: #355079;
+        text-shadow: 1px 1px 1px black;
     }
     .modal__close:hover {
         color: black;

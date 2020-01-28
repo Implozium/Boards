@@ -70,16 +70,16 @@
 </template>
 
 <script>
-import BoardForm from '@/forms/BoardForm.vue';
-import Modal from '@/components/common/Modal.vue';
+import BoardForm from '@/forms/BoardForm';
+import Modal from '@/components/common/Modal';
 import ColumnGrid from '@/components/common/ColumnGrid';
-import ColumnGridItem from '@/components/common/ColumnGrid/ColumnGridItem.vue';
-import CustomButton from '@/components/common/CustomButton.vue';
-import InputSelect from '@/components/inputs/InputSelect.vue';
-import InputRadio from '@/components/inputs/InputRadio.vue';
-import Checkbox from '@/components/inputs/Checkbox.vue';
-import InputText from '@/components/inputs/InputText.vue';
-import Tag from '@/components/common/Tag.vue';
+import ColumnGridItem from '@/components/common/ColumnGrid/ColumnGridItem';
+import CustomButton from '@/components/common/CustomButton';
+import InputSelect from '@/components/inputs/InputSelect';
+import InputRadio from '@/components/inputs/InputRadio';
+import Checkbox from '@/components/inputs/Checkbox';
+import InputText from '@/components/inputs/InputText';
+import Tag from '@/components/common/Tag';
 import NavBlock from '@/components/common/NavBlock';
 import NavBlockGroup from '@/components/common/NavBlock/NavBlockGroup';
 import Column from '@/components/common/Column';

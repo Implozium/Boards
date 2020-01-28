@@ -65,7 +65,7 @@ router.post('/:id/actions/extract', (req, res, next) => {
         });
 });
 router.post('/:id/actions/separate', (req, res, next) => {
-    tasks.separate({ username: req.user.name, id: req.params.id, itemsIds: req.body.itemsIds })
+    tasks.separate({ username: req.user.name, id: req.params.id, itemsIds: req.body.itemsIds, toTaskId: req.body.toTaskId })
         .then(() => res.json({ result: true }))
         .catch((err) => {
             console.error(err);

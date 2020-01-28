@@ -116,7 +116,7 @@ module.exports = {
                 return aTasksList.save();
             });
     },
-    separate({ username, id, itemsIds }) {
+    separate({ username, id, itemsIds, toTaskId }) {
         return TasksList.load({ username })
             .then((aTasksList) => {
                 const aTask = aTasksList.tasks.find(aTask => aTask.id === id);
@@ -126,13 +126,22 @@ module.exports = {
                 if (!aTask.items.length) {
                     return true;
                 }
-                const newTask = common.makeTask(aTask);
-                newTask.title = newTask.title + ' (дополнение)';
-                newTask.done = aTask.done ? Date.now() : 0;
-                newTask.created = Date.now();
-                newTask.id = common.makeGuid();
-                newTask.items = newTask.items.filter((item, i) => itemsIds.includes(i));
-                aTasksList.update(newTask);
+                let toTask = null;
+                if (toTaskId) {
+                    toTask = aTasksList.tasks.find(aTask => aTask.id === toTaskId);
+                    if (toTaskId && !toTask) {
+                        return true;
+                    }
+                } else {
+                    toTask = common.makeTask(aTask);
+                    toTask.title = toTask.title + ' (дополнение)';
+                    toTask.done = aTask.done ? Date.now() : 0;
+                    toTask.created = Date.now();
+                    toTask.id = common.makeGuid();
+                    toTask.items = [];
+                }
+                toTask.items = toTask.items.concat(aTask.items.filter((item, i) => itemsIds.includes(i)));
+                aTasksList.update(toTask);
                 aTask.items = aTask.items.filter((item, i) => !itemsIds.includes(i));
                 return aTasksList.save();
             });

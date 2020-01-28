@@ -1,4 +1,4 @@
-import API from '@/utils/API.js';
+import API from '@/utils/API';
 
 export default {
     namespaced: true,
@@ -128,8 +128,8 @@ export default {
                     console.log(err);
                 });
         },
-        separate({ commit, getters, dispatch }, { id, itemsIds }) {
-            return API.tasks.separate(id, itemsIds)
+        separate({ commit, getters, dispatch }, { id, itemsIds, toTaskId }) {
+            return API.tasks.separate(id, itemsIds, toTaskId)
                 .then((res) => {
                     const task = getters['taskById'](id);
                     return dispatch('load', { boardId: task.boardId });

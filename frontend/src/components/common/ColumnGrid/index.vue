@@ -107,6 +107,181 @@ export default {
                 }, Promise.resolve())
                 .then(() => info);
         },
+        
+        reinitNew() {
+            if (!this.isFinished) {
+                return;
+            }
+            if (this.$el.hidden === true || this.$el.offsetParent === null) {
+                return;
+            }
+            this.isFinished = false;
+
+            // const countOfSubColumns = Math.min(Math.floor(this.$el.getBoundingClientRect().width / this.minSubcolumnWidth) || 1, items.length);
+            const countOfSubColumns = Math.floor(this.$el.getBoundingClientRect().width / this.minSubcolumnWidth) || 1;
+            const columnWidth = Math.floor(this.$el.getBoundingClientRect().width / countOfSubColumns);
+
+            let level = 0;
+            const items = Array.from(this.$el.querySelectorAll('.column-grid__item'))
+                .filter(elem => elem.offsetParent)
+                .map((elem, i) => {
+                    if (i && ["full", "new"].includes(elem.getAttribute("type"))) {
+                        level++;
+                    }
+                    if (!elem.style.transform) {
+                        elem.style.visibility = 'hidden';
+                    }
+                    console.log(elem.style.transform, elem.style.visibility);
+                    return {
+                        level: elem.getAttribute("type") === 'full' ? level++ : level,
+                        item: elem,
+                        column: +elem.getAttribute("column"),
+                    };
+                });
+
+            let lastChunksOffset = 0;
+            let offsetOfHeight = 0;
+
+            const count = 10;
+            const info = [];
+            items.forEach((elem) => {
+                if (!info[elem.level]) {
+                    info[elem.level] = {};
+                }
+                const infoOfColumns = info[elem.level];
+                if (!infoOfColumns[elem.column]) {
+                    infoOfColumns[elem.column] = {
+                        id: elem.column,
+                        to: elem.column,
+                        count: 0,
+                        subcolumns: [],
+                        offset: 0,
+                    }
+                }
+                infoOfColumns[elem.column].count += 1;
+            });
+            const delay = 1000;
+            let currentLevel = 0;
+
+            return items
+                .reduce((chunks, item, i, arr) => {
+                    if (chunks.length === 0 || chunks[chunks.length - 1].length >= count) {
+                        chunks.push([]);
+                    }
+                    chunks[chunks.length - 1].push(item);
+                    return chunks;
+                }, [])
+                .reduce((promise, chunk) => {
+                    return promise.then(() => {
+                        // console.log(chunk);
+                        chunk.forEach((elem) => {
+                            // item.style.transition = "none";
+                            if (elem.item.getAttribute("type") === 'full') {
+                                elem.item.style.width = '100%';
+                            } else {
+                                elem.item.style.width = columnWidth + 'px';
+                            }
+                            // const height = item.getBoundingClientRect().height;
+                            elem.height = elem.item.offsetHeight;
+                            // item.style.transition = "";
+                        });
+
+                        const arr = chunk.concat([]).sort((a, b) => a.level - b.level);
+                        const minLevel = arr[0].level;
+                        const maxLevel = arr[arr.length - 1].level;
+                        // console.log(arr);
+
+                        for (let level = minLevel; level <= maxLevel; level++) {
+                            const infoOfColumns = info[level];
+                            // console.log('level', level, infoOfColumns, info);
+                            const countOfColumn = Object.keys(infoOfColumns).length;
+                            const arrayOfInfo = Object.values(infoOfColumns).sort((a, b) => a.id - b.id);
+                            // console.log('level', level, countOfColumn, infoOfColumns);
+
+                            if (countOfColumn > countOfSubColumns) {
+                                for (let i = countOfColumn; i > countOfSubColumns; i--) {
+                                    const minId = arrayOfInfo.reduce((min, info, i, arr) => {
+                                        if (i === 0) {
+                                            return null;
+                                        }
+                                        if (info.id === info.to && (!min || arr[min].count > info.count)) {
+                                            return i;
+                                        }
+                                        return min;
+                                    }, null);
+                                    arrayOfInfo[minId].to = arrayOfInfo[minId - 1].id;
+                                }
+                                arrayOfInfo.forEach((info, arr) => {
+                                    if (info.id === info.to) {
+                                        info.subcolumns = [0];
+                                    } else {
+                                        let head = infoOfColumns[info.to];
+                                        while (head && head.id !== head.to) {
+                                            head = infoOfColumns[head.to];
+                                        }
+                                        info.to = head.id;
+                                    }
+                                });
+                            } else {
+                                const amount = arrayOfInfo.reduce((amount, info) => amount + info.count, 0);
+                                const arrayOfAmountOfColumns = arrayOfInfo.map(info => ({
+                                    id: info.id,
+                                    count: Math.floor(info.count * countOfSubColumns / amount),
+                                    rest: info.count * countOfSubColumns / amount - Math.floor(info.count * countOfSubColumns / amount),
+                                }));
+                                let restOfCountOfSubColumns = countOfSubColumns;
+                                arrayOfAmountOfColumns.forEach((item) => {
+                                    if (item.count < 1) {
+                                        item.count = 1;
+                                        item.rest = 0;
+                                        restOfCountOfSubColumns--;
+                                    } else {
+                                        restOfCountOfSubColumns -= item.count;
+                                    }
+                                });
+                                arrayOfAmountOfColumns
+                                    .sort((a, b) => b.rest - a.rest === 0 ? b.count - a.count : b.rest - a.rest)
+                                    .forEach((item) => {
+                                        if (restOfCountOfSubColumns > 0) {
+                                            item.count++;
+                                            restOfCountOfSubColumns--;
+                                        } else if (restOfCountOfSubColumns < 0) {
+                                            item.count--;
+                                            restOfCountOfSubColumns++;
+                                        }
+                                        infoOfColumns[item.id].subcolumns = new Array(item.count).fill(0);
+                                    });
+                            }
+                            let offset = 0;
+                            for (let i = 0; i < arrayOfInfo.length; i++) {
+                                arrayOfInfo[i].offset = arrayOfInfo[i - 1] ? offset : 0;
+                                offset = offset + arrayOfInfo[i].subcolumns.length * columnWidth;
+                            }
+
+                            chunk
+                                .filter(elem => elem.level === level)
+                                .forEach((elem, i) => {
+                                    const info = infoOfColumns[elem.column];
+                                    const mainInfo = info.id === info.to ? info : infoOfColumns[info.to];
+                                    const minId = mainInfo.subcolumns.reduce((minId, el, i, arr) => el < arr[minId] ? i : minId, 0);
+                                    if (!elem.item.style.transform) {
+                                        elem.item.addEventListener('transitionend', () => { elem.item.style.visibility = ''; }, { once: true });
+                                    }
+                                    elem.item.style.transform = `translate(${ mainInfo.offset + minId * columnWidth + 'px' }, ${ lastChunksOffset + mainInfo.subcolumns[minId] + 'px' })`;
+                                    mainInfo.subcolumns[minId] += elem.height;
+                                });
+                            lastChunksOffset += Math.max(...arrayOfInfo.reduce((arr, infoOfColumn) => arr.concat(infoOfColumn.subcolumns), []));
+                            offsetOfHeight += chunk.length;
+                        }
+
+                        return new Promise((res, rej) => setTimeout(res, delay));
+                    });
+                }, Promise.resolve())
+                .then(() => {
+                    this.$el.style.height = lastChunksOffset + 'px';
+                    this.isFinished = true;
+                });
+        },
         reinit() {
             if (!this.isFinished) {
                 return;
@@ -114,6 +289,8 @@ export default {
             if (this.$el.hidden === true || this.$el.offsetParent === null) {
                 return;
             }
+            this.isFinished = false;
+            console.log('reinit');
 
             // const countOfSubColumns = Math.min(Math.floor(this.$el.getBoundingClientRect().width / this.minSubcolumnWidth) || 1, items.length);
             const countOfSubColumns = Math.floor(this.$el.getBoundingClientRect().width / this.minSubcolumnWidth) || 1;
@@ -122,9 +299,11 @@ export default {
 
             let lastChunksOffset = 0;
             let offsetOfHeight = 0;
+            console.time('init');
 
             this.getItemsInfo(items, columnWidth)
                 .then((heights) => {
+                    console.timeEnd('init');
                     const chunks = items
                         .reduce((chunks, item, i, arr) => {
                             if (chunks[chunks.length - 1].length === 0 || !["full", "new"].includes(item.getAttribute("type"))) {
@@ -202,7 +381,7 @@ export default {
                                         if (restOfCountOfSubColumns > 0) {
                                             item.count++;
                                             restOfCountOfSubColumns--;
-                                        } else if (restOfCountOfSubColumns < 0) {
+                                        } else if (restOfCountOfSubColumns < 0 && item.count > 1) {
                                             item.count--;
                                             restOfCountOfSubColumns++;
                                         }

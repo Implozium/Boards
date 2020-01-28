@@ -1,36 +1,42 @@
 <template>
     <div class="task__wrapper">
-        <div class="task" :class="{ task_done: taskInfo.isDone, task_archival: task.archival, task_active: actived || active, ['task_' + type]: true, ['task_period']: task.type === 'week' || task.type === 'month' }" ref="task" @click="clickTask">
+        <div
+            class="task"
+            :class="{ task_done: taskInfo.isDone, task_archival: !view && task.archival, task_active: view || active, ['task_' + type]: true, 'task_period': task.type === 'week' || task.type === 'month', task_view: view }"
+            ref="task"
+            @click="clickTask"
+        >
             <div class="task__inner">
                 <div class="task__head">
-                    <checkbox v-if="task.type !== 'common'" :checked="taskInfo.isDone" :name="task.id" @click="handleTask" :style="{ visibility: taskInfo.canSetDone ? 'visible' : 'hidden' }"/>
+                    <checkbox v-if="task.type !== 'common'" :checked="taskInfo.isDone" :name="task.id" type="big" :style="{ display: taskInfo.canSetDone ? '' : 'none' }" @click="handleTask"/>
                     <div class="task__title">
                         <div class="task__title-upper">
                             <span
                                 >{{ task.title }}&nbsp;<span class="task__title-badge">
-                                    <span class="task__title-badge-item task__title-badge-item_links" v-if="task.links.length">{{ task.links.length }}</span><span class="task__title-badge-item task__title-badge-item_items" v-if="task.items.length">{{ task.items.length - undoneItems.length }} / {{ task.items.length }}</span>
+                                    <span class="task__title-badge-item task__title-badge-item_links" v-if="task.links.length">{{ task.links.length }}</span><span class="task__title-badge-item task__title-badge-item_items" v-if="task.items.length">{{ task.type !== 'common' ? (task.items.length - undoneItems.length) + '/' + task.items.length : task.items.length }}</span>
                                 </span>
                             </span>
                             <div class="task__buttons">
                                 <div
-                                    v-if="task.description || task.items.length"
+                                    v-if="(task.description || task.items.length) && !view"
                                     class="task__button task__button_single"
                                     :title="task.open ? 'свернуть' : 'развернуть'"
                                     @click="onOpen"
-                                    >{{ task.open ? '⏶' : '⏷' }}</div>
-                                <div class="task__button task__button_single" @click="onShow">👁</div>
+                                >{{ task.open ? '⏶' : '⏷' }}</div>
+                                <div v-if="!view" class="task__button task__button_single" @click="onShow">👁</div>
                                 <menu-block class="task__button">
                                     <template v-slot:main>…</template>
                                     <menu-block-item @click="onEdit">редактировать</menu-block-item>
                                     <menu-block-item @click="onMove">переместить</menu-block-item>
                                     <menu-block-hr></menu-block-hr>
                                     <menu-block-item type="ex" :checked="task.archival !== 0" @click="onArchive">архивная</menu-block-item>
+                                    <menu-block-item type="ex" :checked="task.undoneItems" @click="onUndoneItems">только незавершенные</menu-block-item>
                                     <menu-block-item @click="onOpen" v-if="task.description || task.items.length">{{ task.open ? 'свернуть' : 'развернуть' }}</menu-block-item>
                                     <menu-block-hr></menu-block-hr>
                                     <menu-block-item title="Преобразовать в доску" @click="onExpand">расширить</menu-block-item>
                                     <menu-block-item title="Добавить копию задачи в текущую доску" @click="onCopy">копировать</menu-block-item>
                                     <menu-block-item v-if="task.items.length" title="Разбить пункты этой задачи на отдельные задачи" @click="onExtract">разбить</menu-block-item>
-                                    <menu-block-item v-if="task.items.length" title="Разделить (переместить) пункты этой задачи в новую задачу" @click="onSeparate">разделить</menu-block-item>
+                                    <menu-block-item v-if="task.items.length" title="Разделить (переместить) пункты этой задачи в новую задачу" @click="onSeparate">разделить (переместить)</menu-block-item>
                                     <menu-block-item title="Присоединить эту задачу к другой задаче" @click="onAttach">присоединить&nbsp;к</menu-block-item>
                                     <menu-block-hr></menu-block-hr>
                                     <menu-block-item @click="onRemove">удалить</menu-block-item>
@@ -38,29 +44,48 @@
                             </div>
                         </div>
                         <!--<div class="task__title-length" v-if="taskInfo.allTime">({{ taskInfo.allTime }})</div>-->
-                        <div class="task__title-info">
-                            <div v-if="task.archival !== 0" class="task__title-info-item task__title-info-item_archival">архивная</div>
-                            <div v-if="taskInfo.allTime" class="task__title-info-item">{{ taskInfo.allTime }}</div>
-                            <div v-if="!taskInfo.isDone && type === 'past' && taskInfo.afterTo" class="task__title-info-item task__title-info-item_past">{{ taskInfo.afterTo }}</div>
-                            <div v-else-if="!taskInfo.isDone && type === 'present' && taskInfo.beforeTo" class="task__title-info-item task__title-info-item_present">{{ taskInfo.beforeTo }}</div>
-                            <div v-else-if="!taskInfo.isDone && type === 'future' && taskInfo.beforeFrom" class="task__title-info-item task__title-info-item_future">{{ taskInfo.beforeFrom }}</div>
-                        </div>
+                        <title-info>
+                            <title-info-item v-if="task.archival !== 0" icon="archival">архивная</title-info-item>
+                            <title-info-item v-if="taskInfo.allTime">{{ taskInfo.allTime }}</title-info-item>
+                            <title-info-item v-if="!taskInfo.isDone && type === 'past' && taskInfo.afterTo" type="danger-invert">{{ taskInfo.afterTo }}</title-info-item>
+                            <title-info-item v-else-if="!taskInfo.isDone && type === 'present' && taskInfo.beforeTo" type="warning-invert">{{ taskInfo.beforeTo }}</title-info-item>
+                            <title-info-item v-else-if="!taskInfo.isDone && type === 'future' && taskInfo.beforeFrom" type="success-invert">{{ taskInfo.beforeFrom }}</title-info-item>
+                        </title-info>
                         <div class="task__title-tags" v-if="task.tags.length">
                             <tag v-for="(tag) in task.tags" :key="tag">{{ tag }}</tag>
                         </div>
                     </div>
                 </div>
 
-                <div class="task__body" :class="{ 'task__body_fixed': fixed }" v-if="(opened || task.open) && (task.description || task.items.length)">
-                    <div class="task__description"><md-viewer :text="task.description"></md-viewer></div>
-                    <ol class="task__items" v-if="task.items.length">
-                        <li class="task__item" v-for="(item, i) in task.items" :key="i" :class="{ task__item_done: item.done }">
-                            <div class="task__item-title">
-                                <checkbox v-if="task.type !== 'common'" :checked="Boolean(item.done)" :name="i" @click="handleItem"/><span>{{ item.title }}</span>
+                <div
+                    v-if="(view || task.open) && (task.description || task.items.length)"
+                    class="task__body"
+                    :class="{ 'task__body_fixed': fixed, 'task__body_undone-items': !view && task.type !== 'common' && task.undoneItems }"
+                >
+                    <div class="task__description" v-if="task.description"><md-viewer :text="task.description"></md-viewer></div>
+                    <div class="task__items" v-if="task.items.length">
+                        <div class="task__item" v-for="(item, i) in task.items" :key="i" :class="{ task__item_done: task.type !== 'common' && item.done }">
+                            <div class="task__item-header">
+                                <div class="task__item-index">{{ i + 1 }}.&nbsp;</div>
+                                <checkbox v-if="task.type !== 'common'" :checked="Boolean(item.done)" :name="i" type="big" @click="handleItem"/>
+                                <div class="task__item-title">
+                                    <div>
+                                        <span :class="{ 'task__item-title_done': task.type !== 'common' && item.done }">{{ item.title }}</span><span
+                                            v-if="item.description && !view"
+                                            class="task__button task__button_single"
+                                            :title="item.open ? 'свернуть' : 'развернуть'"
+                                            @click="onOpenItem(i)"
+                                        >{{ item.open ? '&nbsp;⏶' : '&nbsp;⏵' }}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="task__item-description" v-if="item.description"><md-viewer :text="item.description"></md-viewer></div>
-                        </li>
-                    </ol>
+                            <title-info v-if="task.type !== 'common' && view">
+                                <title-info-item v-if="item.created">{{ toDate(item.created) }}</title-info-item>
+                                <title-info-item v-if="item.done" type="success">{{ toDate(item.done) }}</title-info-item>
+                            </title-info>
+                            <div class="task__item-description" v-if="view || item.description && item.open"><md-viewer :text="item.description"></md-viewer></div>
+                        </div>
+                    </div>
                 </div>
                 <!-- <div class="task__body task__body_closed" v-if="task.description || task.items.length" @click="onOpen">…</div> -->
                 <!-- <div class="task__body task__body_closed" v-else-if="!task.open" @click="onOpen">˅</div> -->
@@ -70,7 +95,7 @@
                 <div class="task__footer" v-else-if="!taskInfo.isDone && type === 'future' && taskInfo.beforeFrom">{{ taskInfo.beforeFrom }}</div>-->
             </div>
 
-            <div v-if="active || actived" class="task__info" :class="{ ['task__info_' + position]: true }">
+            <div v-if="active || view" class="task__info" :class="{ ['task__info_' + position]: true }">
                 <div class="task__info-item" v-if="task.from || task.to || taskInfo.allTime || taskInfo.doneTime">
                     <template v-if="taskInfo.fromAsString">
                         <div class="task__info-item-title">Начало:</div>
@@ -117,13 +142,15 @@
 </template>
 
 <script>
-import Checkbox from '@/components/inputs/Checkbox.vue';
+import Checkbox from '@/components/inputs/Checkbox';
 import MenuBlock from '@/components/common/MenuBlock';
-import MenuBlockItem from '@/components/common/MenuBlock/MenuBlockItem.vue';
-import MenuBlockHr from '@/components/common/MenuBlock/MenuBlockHr.vue';
-import MdViewer from '@/components/common/MdViewer.vue';
+import MenuBlockItem from '@/components/common/MenuBlock/MenuBlockItem';
+import MenuBlockHr from '@/components/common/MenuBlock/MenuBlockHr';
+import MdViewer from '@/components/common/MdViewer';
 import Common from 'common';
-import Tag from '@/components/common/Tag.vue';
+import Tag from '@/components/common/Tag';
+import TitleInfo from '@/components/common/TitleInfo';
+import TitleInfoItem from '@/components/common/TitleInfo/TitleInfoItem';
 
 export default {
     components: {
@@ -133,6 +160,8 @@ export default {
         MenuBlockHr,
         MdViewer,
         Tag,
+        TitleInfo,
+        TitleInfoItem,
     },
     props: {
         'task': {
@@ -146,11 +175,7 @@ export default {
             type: Boolean,
             default: true,
         },
-        "actived": {
-            type: Boolean,
-            default: false,
-        },
-        "opened": {
+        "view": {
             type: Boolean,
             default: false,
         },
@@ -205,6 +230,11 @@ export default {
             items[name].done = value ? Date.now() : 0;
             this.$emit('update', this.task.id, { items: items });
         },
+        onOpenItem(i) {
+            const items = this.task.items.map(item => Object.assign({}, item));
+            items[i].open = !items[i].open;
+            this.$emit('update', this.task.id, { items: items });
+        },
         handleTask(event) {
             const {
                 name,
@@ -233,6 +263,9 @@ export default {
             this.$emit('update', this.task.id, { open: !this.task.open });
             //this.deactivate();
         },
+        onUndoneItems() {
+            this.$emit('update', this.task.id, { undoneItems: !this.task.undoneItems });
+        },
         onShow() {
             this.$emit('show', this.task.id);
             this.deactivate();
@@ -258,13 +291,16 @@ export default {
             this.deactivate();
         },
         clickTask() {
-            if (!this.active && !this.ignoreClick && this.actived === false) {
+            if (!this.active && !this.ignoreClick && this.view === false) {
                 const bordersOfTask = this.$refs.task.getBoundingClientRect();
                 const bordersOfBody = document.body.getBoundingClientRect();
                 this.position = bordersOfBody.width - bordersOfTask.right > bordersOfTask.left ? "right" : "left";
                 this.active = true;
             }
             this.ignoreClick = false;
+        },
+        toDate(date) {
+            return Common.toDate(date);
         }
     },
 }
@@ -281,7 +317,7 @@ export default {
         position: relative;
         background-color: #355079;;
         color: #cfd9e7;
-        animation: anim-show 0.3s;
+        /* animation: anim-show 0.3s; */
         /*border-radius: 8px; */
         box-shadow: 0 0 8px 2px #355079;
     }
@@ -378,6 +414,8 @@ export default {
     }
     .task__title-upper {
         display: flex;
+        padding-top: 1px;
+        padding-left: 2px;
     }
     .task__title-length {
         font-size: 14px;
@@ -432,70 +470,6 @@ export default {
         display: flex;
         flex-wrap: wrap;
     }
-    .task__title-info-item {
-        border: 1px solid #6e6e6e;
-        border-radius: 10px;
-        padding: 0 8px 0 22px;
-        margin-right: 12px;
-        margin-top: 4px;
-        position: relative;
-        background-color: #f2f2f2;
-        color: #6e6e6e;
-        text-shadow: none;
-        font-weight: 600;
-        font-size: 12px;
-    }
-    .task__title-info-item::before {
-        content: '';
-        border: 1px solid #6e6e6e;
-        border-radius: 10px;
-        width: 18px;
-        height: 18px;
-        position: absolute;
-        left: -1px;
-        top: -1px;
-        /* background-color: #6e6e6e; */
-        padding-left: 4px;
-        box-sizing: border-box;
-    }
-    .task__title-info-item_past {
-        border-color: #f93e3e;
-        background-color: #fcbaba;
-        color: #f93e3e;
-    }
-    .task__title-info-item_past::before {
-        border: 2px solid #f93e3e;
-    }
-    .task__title-info-item_present {
-        border-color: #fca130;
-        background-color: #fedfb9;
-        color: #fca130;
-    }
-    .task__title-info-item_present::before {
-        border: 2px solid #fca130;
-    }
-    .task__title-info-item_future {
-        border-color: #49cc90;
-        background-color: #b7ebd4;
-        color: #49cc90;
-    }
-    .task__title-info-item_future::before {
-        border: 2px solid #49cc90;
-    }
-    .task__title-info-item_archival {
-        color: #a0a0a0;
-        background-color: #fff;
-        border-color: #a0a0a0;
-        /* text-shadow: 0 0 0px black; */
-        font-weight: 600;
-    }
-    .task__title-info-item_archival::before {
-        border-color: #a0a0a0;
-        content: '🕮';
-        font-size: 10px;
-        padding-left: 2px;
-        padding-top: 1px;
-    }
     .task__buttons {
         display: flex;
         flex-grow: 1;
@@ -518,7 +492,7 @@ export default {
         color: black;
     }
     .task__body {
-        padding: 10px;
+        padding: 12px;
         /* color: #909090; */
         /* border-top: 2px solid #909090; */
         /* background-color: white; */
@@ -545,17 +519,63 @@ export default {
         color: #eaeff5;
         white-space: pre-wrap;
         word-break: break-word;
+        margin-bottom: 12px;
     }
     .task__items {
         margin: 0px;
-        padding: 6px 0 6px 14px;
+        /* padding: 6px 0 6px 26px; */
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        margin-top: -12px;
     }
     .task__item {
         font-size: 14px;
         line-height: 22px;
+        flex-basis: 260px;
+        flex-grow: 1;
+        /* border: 1px solid grey; */
+        border-radius: 8px;
+        padding: 6px 12px;
+        background-color: rgba(255, 255, 255, 0.1);
+        margin-top: 12px;
+    }
+    /* .task__item + .task__item {
+        margin-top: 12px;
+    } */
+    .task_view .task__items {
+        margin-left: -20px;
+    }
+    .task_view .task__item {
+        margin-left: 20px;
+        margin-top: 20px;
+    }
+    .task__body_undone-items .task__item.task__item_done {
+        display: none;
+    }
+    .task__item-header {
+        font-weight: 600;
+        display: flex;
+        color: azure;
+        /* align-items: center; */
+    }
+    .task__item-index {
+        display: flex;
+        min-width: 26px;
+        /* text-align: right; */
+        height: 36px;
+        align-items: center;
+        justify-content: flex-end;
     }
     .task__item-title {
-        font-weight: 600;
+        display: flex;
+        min-height: 36px;
+        align-items: center;
+        margin-left: 4px;
+    }
+    .task__item-title_done {
+        /* text-decoration: line-through; */
+        color: #41ff9c;
     }
     .task__item-description {
         color: #eaeff5;
@@ -563,10 +583,7 @@ export default {
         word-break: break-word;
         font-size: 12px;
         margin-bottom: 8px;
-    }
-    .task__item_done .task__item-title span {
-        text-decoration: line-through;
-        color: #9cb1ce;
+        /* margin-left: 26px; */
     }
     .task__footer {
         text-align: center;
@@ -597,6 +614,11 @@ export default {
     .task__info_left {
         right: 100%;
         margin-right: 12px;
+    }
+    .task_view .task__info {
+        position: static;
+        margin: 0px;
+        width: 100%;
     }
     .task__info-item {
         /* border-radius: 4px; */

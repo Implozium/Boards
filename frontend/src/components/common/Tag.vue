@@ -27,8 +27,8 @@ export default {
         box-sizing: border-box;
         border: 2px solid #4747eb;
         height: 18px;
-        line-height: 14px;
-        font-size: 14px;
+        line-height: 16px;
+        font-size: 11px;
         margin-right: 6px;
         padding: 0 6px 0 6px;
         border-radius: 8px;
@@ -36,6 +36,8 @@ export default {
         font-weight: bold;
         margin-top: 4px;
         transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
     }
     .tag::before {
         content: ':';
@@ -48,8 +50,8 @@ export default {
     }
     .tag_default {
         background-color: #fff;
-        color: #8383dd;
-        border: 2px solid #8383dd;
+        color: #5d5de2;
+        border: 2px solid #5d5de2;
     }
     .tag_activing:hover,
     .tag_actived {

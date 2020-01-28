@@ -18,13 +18,6 @@
                                 </menu-block>
                             </div>
                         </div>
-                        <!-- <div class="board__title-info">
-                            <div v-if="board.state === 'have-read'" class="board__title-info-item board__title-info-item_have-read">прочитана</div>
-                            <div v-else-if="board.state === 'reading'" class="board__title-info-item board__title-info-item_reading">читается</div>
-                            <div v-else-if="board.state === 'new'" class="board__title-info-item board__title-info-item_new">новая</div>
-                            <div v-if="board.theme" class="board__title-info-item">{{ board.theme }}</div>
-                            <div v-if="board.archival !== 0" class="board__title-info-item board__title-info-item_archival">арх</div>
-                        </div> -->
                         <div class="board__title-tags" v-if="board.tags.length">
                             <tag v-for="(tag) in board.tags" :key="tag">{{ tag }}</tag>
                         </div>
@@ -42,10 +35,10 @@
 
 <script>
 import MenuBlock from '@/components/common/MenuBlock';
-import MenuBlockItem from '@/components/common/MenuBlock/MenuBlockItem.vue';
-import MenuBlockHr from '@/components/common/MenuBlock/MenuBlockHr.vue';
+import MenuBlockItem from '@/components/common/MenuBlock/MenuBlockItem';
+import MenuBlockHr from '@/components/common/MenuBlock/MenuBlockHr';
 import Common from 'common';
-import Tag from '@/components/common/Tag.vue';
+import Tag from '@/components/common/Tag';
 
 export default {
     components: {

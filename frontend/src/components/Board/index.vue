@@ -19,18 +19,15 @@
                                 :title="aBoard.description || ''"
                                 @click="setBoard(aBoard.id)"
                             >
-                                <div class="board__boards-item-title">{{ aBoard.title }}</div>
+                                <div class="board__boards-item-title">{{ (aBoard.id === boardId ? '➜ ' : '') + aBoard.title }}</div>
                                 <div class="board__boards-item-description">{{ aBoard.description }}</div>
                             </menu-block-item>
                         </menu-block>
-                        <template v-if="board">
-                            <div class="board__info-button"><slot name="board-menu"></slot></div>
-                        </template>
                     </div>
                 </nav-block-group>
                 <template v-if="board">
                     <nav-block-group>
-                        <div class="board__info-button board__info-button_add" @click="onEditTask">+ Новая задача</div>
+                        <div class="board__info-button" @click="onEditTask">+ Новая задача</div>
                     </nav-block-group>
                     <nav-block-group title="Фильтрация по">
                         <input-text :value="filters.str" name="str" title="Поиск" @change="setTextFilter"></input-text>
@@ -45,6 +42,8 @@
                         <div class="board__info-tags">
                             <tag v-for="(tag) in tags" :key="tag" :has-activing="true" @click="toggleTag(tag)" :status="filters.tags.includes(tag) ? 'actived' : 'default'">{{ tag }}</tag>
                         </div>
+                        <br/>
+                        <div v-if="isFilters" class="board__info-button" @click="resetFilter">Сбросить фильтры</div>
                     </nav-block-group>
                 </template>
             </template>
@@ -71,6 +70,23 @@
                 </column-grid>
             </template>
         </nav-block>
+        <modal v-if="modals.showing.show" @hide="closeModals" type="raw">
+            <task
+                class="board__showing-task"
+                :fixed="false"
+                :view="true"
+                :task="modals.showing.wrappedTask.task"
+                :type="modals.showing.wrappedTask.type"
+                @edit="onEditTask"
+                @remove="onRemoveTask"
+                @archive="archiveTask"
+                @update="subupdateTask"
+                @move="onMoveTask"
+                @show="onShowTask"
+                @expand="onExpandTask"
+            >
+            </task>
+        </modal>
         <modal v-if="modals.editing.show" @hide="closeModals" :close-on-wrap="false" type="full">
             <template v-slot:header>
                 Редактировать задачу
@@ -116,24 +132,6 @@
                 <custom-button type="primary" @click="moveTask(modals.moving.task.id, modals.moving.boardId), closeModals()">Переместить</custom-button>
             </template>
         </modal>
-        <modal v-if="modals.showing.show" @hide="closeModals" type="raw">
-            <task
-                class="board__showing-task"
-                :fixed="false"
-                :actived="true"
-                :opened="true"
-                :task="modals.showing.wrappedTask.task"
-                :type="modals.showing.wrappedTask.type"
-                @edit="onEditTask"
-                @remove="onRemoveTask"
-                @archive="archiveTask"
-                @update="subupdateTask"
-                @move="onMoveTask"
-                @show="onShowTask"
-                @expand="onExpandTask"
-            >
-            </task>
-        </modal>
         <modal v-if="modals.expanding.show" @hide="closeModals" type="short">
             <template v-slot:header>
                 Вы действительно преобразовать (расширить) задачу в доску<br/>"<b>{{ modals.expanding.task.title }}</b>"?
@@ -163,9 +161,16 @@
         </modal>
         <modal v-if="modals.separating.show" @hide="closeModals" type="short">
             <template v-slot:header>
-                Какие пункты этой задачи переместить в новую задачу<br/>"<b>{{ modals.separating.task.title }}</b>"?
+                Какие пункты этой задачи переместить в другую задачу<br/>"<b>{{ modals.separating.task.title }}</b>"?
             </template>
             <template v-slot:default>
+                <input-select
+                    name="toTaskId"
+                    title="Задача к которой присоединить эти пункты"
+                    :value="modals.separating.toTaskId"
+                    :items="modals.separating.toTaskItems"
+                    @change="modals.separating.toTaskId = $event.value"
+                ></input-select>
                 <ol>
                     <li v-for="(item, i) in modals.separating.task.items" :key="i">
                         <checkbox
@@ -177,7 +182,7 @@
                 </ol>
             </template>
             <template v-slot:footer>
-                <custom-button type="primary" @click="separateTask(modals.separating.task.id, modals.separating.itemsIds), closeModals()">Разделить (переместить)</custom-button>
+                <custom-button type="primary" @click="separateTask(modals.separating.task.id, modals.separating.itemsIds, modals.separating.toTaskId), closeModals()">Разделить (переместить)</custom-button>
             </template>
         </modal>
         <modal v-if="modals.attaching.show" @hide="closeModals" type="medium">
@@ -201,21 +206,21 @@
 </template>
 
 <script>
-import TaskForm from '@/forms/TaskForm.vue';
-import Modal from '@/components/common/Modal.vue';
+import TaskForm from '@/forms/TaskForm';
+import Modal from '@/components/common/Modal';
 import ColumnGrid from '@/components/common/ColumnGrid';
-import ColumnGridItem from '@/components/common/ColumnGrid/ColumnGridItem.vue';
-import CustomButton from '@/components/common/CustomButton.vue';
-import InputSelect from '@/components/inputs/InputSelect.vue';
-import InputRadio from '@/components/inputs/InputRadio.vue';
-import Checkbox from '@/components/inputs/Checkbox.vue';
-import InputText from '@/components/inputs/InputText.vue';
-import Tag from '@/components/common/Tag.vue';
+import ColumnGridItem from '@/components/common/ColumnGrid/ColumnGridItem';
+import CustomButton from '@/components/common/CustomButton';
+import InputSelect from '@/components/inputs/InputSelect';
+import InputRadio from '@/components/inputs/InputRadio';
+import Checkbox from '@/components/inputs/Checkbox';
+import InputText from '@/components/inputs/InputText';
+import Tag from '@/components/common/Tag';
 import NavBlock from '@/components/common/NavBlock';
 import NavBlockGroup from '@/components/common/NavBlock/NavBlockGroup';
 import Column from '@/components/common/Column';
 import Row from '@/components/common/Row';
-import Task from './Task.vue';
+import Task from './Task';
 import MenuBlock from '@/components/common/MenuBlock';
 import MenuBlockItem from '@/components/common/MenuBlock/MenuBlockItem';
 import Common from 'common';
@@ -281,6 +286,8 @@ export default {
                     show: false,
                     task: null,
                     itemsIds: null,
+                    toTaskId: null,
+                    toTaskItems: [],
                 },
                 attaching: {
                     show: false,
@@ -293,19 +300,14 @@ export default {
             mappingForTaskTypes: {
                 "done": 0,
                 "past": 1,
-                "present": 2,
+                "present": 1,
                 // "week": 2,
                 // "month": 2,
+                "future": 1,
                 "free": 2,
-                "future": 3,
-                "common": 4,
+                "common": 3,
             },
-            filters: {
-                tags: [],
-                str: '',
-                timer: null,
-                type: 'active',
-            }
+            filters: this.getDefaultFilter(),
         };
     },
     computed: {
@@ -320,6 +322,9 @@ export default {
         },
         tasks() {
             return this.$store.getters['tasks/tasksByBoardId'](this.boardId);
+        },
+        isFilters() {
+            return JSON.stringify(this.filters) !== JSON.stringify(this.getDefaultFilter());
         },
         wrappedTasks() {
             return this.tasks
@@ -354,7 +359,12 @@ export default {
                         column: this.mappingForTaskTypes[type],
                     };
                 })
-                .sort((aWrapper, bWrapper) => aWrapper.task.from && bWrapper.task.from ? aWrapper.task.from - bWrapper.task.from : aWrapper.task.from ? -1 : 1); // aWrapper.task.done ? 1 : bWrapper.task.done ? -1 : 
+                .sort((aWrapper, bWrapper) => aWrapper.column !== bWrapper.column
+                    ? aWrapper.column - bWrapper.column
+                    : aWrapper.task.from && bWrapper.task.from
+                        ? aWrapper.task.from - bWrapper.task.from
+                        : aWrapper.task.from ? -1 : 1
+                ); // aWrapper.task.done ? 1 : bWrapper.task.done ? -1 : 
         },
         tags() {
             return this.tasks
@@ -385,12 +395,17 @@ export default {
         this.timer = null;
     },
     methods: {
-        resetFilter() {
-            this.filters = {
+        getDefaultFilter() {
+            return {
                 tags: [],
                 str: '',
                 type: 'active',
+                state: '*',
+                theme: '*',
             };
+        },
+        resetFilter() {
+            this.filters = this.getDefaultFilter();
         },
         onEditTask(id) {
             this.closeModals();
@@ -444,6 +459,17 @@ export default {
             this.modals.separating.show = true;
             this.modals.separating.task = this.tasks.find(task => task.id === id);
             this.modals.separating.itemsIds = this.modals.separating.task.items.map(item => false);
+            const tasks = this.tasks.filter((aTask) => {
+                return aTask.id !== id && (
+                    this.filters.type === 'active' && !aTask.archival
+                    || this.filters.type === 'archival' && aTask.archival
+                    || this.filters.type === 'all'
+                );
+            });
+            this.modals.separating.toTaskId = 'new';
+            this.modals.separating.toTaskItems = tasks
+                .map(aTask => ({ title: aTask.title, value: aTask.id }))
+                .concat([{ title: '---', value: '---', disabled: true }, { title: 'Новая задача', value: 'new' }])
         },
         onAttachTask(id) {
             this.closeModals();
@@ -489,8 +515,8 @@ export default {
         extractTask(id, itemsIds) {
             this.$store.dispatch('tasks/extract', { id: id, itemsIds: itemsIds.reduce((res, checked, i) => checked ? res.concat(i) : res, []) });
         },
-        separateTask(id, itemsIds) {
-            this.$store.dispatch('tasks/separate', { id: id, itemsIds: itemsIds.reduce((res, checked, i) => checked ? res.concat(i) : res, []) });
+        separateTask(id, itemsIds, toTaskId) {
+            this.$store.dispatch('tasks/separate', { id: id, itemsIds: itemsIds.reduce((res, checked, i) => checked ? res.concat(i) : res, []), toTaskId: toTaskId === 'new' ? '' : toTaskId });
         },
         attachTask(id, toTaskId) {
             this.$store.dispatch('tasks/attach', { id: id, toTaskId: toTaskId });
@@ -617,8 +643,6 @@ export default {
     }
     .board__info-button {
         align-self: center;
-    }
-    .board__info-button_add {
         border: 2px solid #444;
         border-radius: 4px;
         padding: 4px 12px;
@@ -629,7 +653,7 @@ export default {
         transition: all 0.3s;
         color: #666;
     }
-    .board__info-button_add:hover {
+    .board__info-button:hover {
         border: 2px solid #888;
         color: #000;
     }

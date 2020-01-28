@@ -28,6 +28,7 @@ const Common = {
             boardId: params.boardId,
             open: params.open !== undefined ? params.open : true,
             tags: params.tags ? params.tags.concat() : [],
+            undoneItems: params.undoneItems !== undefined ? params.undoneItems : false,
         };
     },
     getAddedMsAndMs(arr, val, time, comparator = (val, date) => false) {
@@ -194,6 +195,7 @@ const Common = {
             description: params.description || '',
             done: params.done || 0,
             created: params.created || Date.now(),
+            open: params.open !== undefined ? params.open : true,
         };
     },
     makeLink(params = {}) {

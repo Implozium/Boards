@@ -89,7 +89,7 @@ export default {
         position: relative;
     }
     .nav-block__body-menu {
-        width: 240px;
+        width: 300px;
         border-right: 2px solid #111;
         background-color: #2d2d2d;
         padding-left: 8px;

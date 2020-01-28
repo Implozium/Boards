@@ -21,10 +21,10 @@
 </template>
 
 <script>
-import InputText from '@/components/inputs/InputText.vue';
-import Column from '@/components/common/Column.vue';
-import Row from '@/components/common/Row.vue';
-import Tag from '@/components/common/Tag.vue';
+import InputText from '@/components/inputs/InputText';
+import Column from '@/components/common/Column';
+import Row from '@/components/common/Row';
+import Tag from '@/components/common/Tag';
 import Common from 'common';
 
 export default {

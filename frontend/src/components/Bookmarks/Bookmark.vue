@@ -2,7 +2,7 @@
     <div class="bookmark__wrapper">
         <div class="bookmark" :class="{ bookmark_archival: bookmark.archival }" ref="bookmark">
             <div class="bookmark__image"></div>
-            <div class="bookmark__inner">
+            <div class="bookmark__inner" :class="{ bookmark___inner_chosen: bookmark.chosen }">
                 <div class="bookmark__head">
                     <div class="bookmark__title">
                         <div class="bookmark__title-upper">
@@ -10,6 +10,7 @@
                             <div class="bookmark__buttons">
                                 <div
                                     class="bookmark__button bookmark__button_single"
+                                    :class="{ bookmark__button_active: bookmark.chosen }"
                                     :title="bookmark.chosen ? 'Удалить из избранных' : 'Добавить в избранные'"
                                     @click="onChoose"
                                     >{{ bookmark.chosen ? '★' : '☆' }}</div>
@@ -28,15 +29,15 @@
                                 </menu-block>
                             </div>
                         </div>
-                        <div class="bookmark__title-info">
-                            <div v-if="bookmark.state === 'have-read'" class="bookmark__title-info-item bookmark__title-info-item_have-read">прочитана</div>
-                            <div v-else-if="bookmark.state === 'reading'" class="bookmark__title-info-item bookmark__title-info-item_reading">читается</div>
-                            <div v-else-if="bookmark.state === 'new'" class="bookmark__title-info-item bookmark__title-info-item_new">новая</div>
-                            <div v-if="bookmark.theme" class="bookmark__title-info-item">{{ bookmark.theme }}</div>
-                            <!-- <div v-if="bookmark.created" class="bookmark__title-info-item">{{ createdAsString }}</div>
-                            <div v-if="bookmark.seen" class="bookmark__title-info-item">{{ seenAsString }}</div> -->
-                            <div v-if="bookmark.archival !== 0" class="bookmark__title-info-item bookmark__title-info-item_archival">арх</div>
-                        </div>
+                        <title-info>
+                            <title-info-item v-if="bookmark.state === 'have-read'" type="success">прочитана</title-info-item>
+                            <title-info-item v-else-if="bookmark.state === 'reading'" type="warning">читается</title-info-item>
+                            <title-info-item v-else-if="bookmark.state === 'new'" type="danger">новая</title-info-item>
+                            <title-info-item v-if="bookmark.theme">{{ bookmark.theme }}</title-info-item>
+                            <!-- <title-info-item v-if="bookmark.created">{{ createdAsString }}</title-info-item>
+                            <title-info-item v-if="bookmark.seen">{{ seenAsString }}</title-info-item> -->
+                            <title-info-item v-if="bookmark.archival !== 0" icon="archival">арх</title-info-item>
+                        </title-info>
                         <div class="bookmark__title-tags" v-if="bookmark.tags.length">
                             <tag v-for="(tag) in bookmark.tags" :key="tag">{{ tag }}</tag>
                         </div>
@@ -54,11 +55,13 @@
 
 <script>
 import MenuBlock from '@/components/common/MenuBlock';
-import MenuBlockItem from '@/components/common/MenuBlock/MenuBlockItem.vue';
-import MenuBlockHr from '@/components/common/MenuBlock/MenuBlockHr.vue';
-import MdViewer from '@/components/common/MdViewer.vue';
+import MenuBlockItem from '@/components/common/MenuBlock/MenuBlockItem';
+import MenuBlockHr from '@/components/common/MenuBlock/MenuBlockHr';
+import MdViewer from '@/components/common/MdViewer';
 import Common from 'common';
-import Tag from '@/components/common/Tag.vue';
+import Tag from '@/components/common/Tag';
+import TitleInfo from '@/components/common/TitleInfo';
+import TitleInfoItem from '@/components/common/TitleInfo/TitleInfoItem';
 
 export default {
     components: {
@@ -67,6 +70,8 @@ export default {
         MenuBlockHr,
         MdViewer,
         Tag,
+        TitleInfo,
+        TitleInfoItem,
     },
     props: {
         'bookmark': {
@@ -83,6 +88,25 @@ export default {
         },
         seenAsString() {
             return this.bookmark.seen ? new Date(this.bookmark.seen).toISOString().split('T')[0] : '';
+        },
+        color() {
+            function hashCode(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                return hash;
+            }
+
+            function intToRGB(i) {
+                const c = (i & 0x00FFFFFF)
+                    .toString(16)
+                    .toUpperCase();
+
+                return "00000".substring(0, 6 - c.length) + c;
+            }
+
+            return intToRGB(hashCode(this.bookmark.href.replace(/(?:.+\/\/)?([^\/]+)(?:\/.+)?/, '$1')));
         }
     },
     created() {
@@ -125,7 +149,7 @@ export default {
         transition: all 0.3s;
         box-sizing: border-box;
         position: relative;
-        animation: anim-show 0.3s;
+        /* animation: anim-show 0.3s; */
         /*border-radius: 8px; */
         display: flex;
     }
@@ -167,11 +191,13 @@ export default {
     }
     .bookmark__inner {
         position: relative;
-        background-color: #355079;;
+        background-color: #355079;
         color: #cfd9e7;
         /* box-shadow: 0 0 8px 2px #355079; */
         box-sizing: border-box;
         flex-grow: 1;
+        border: 1px solid #355079;
+        box-sizing: border-box;
     }
     /* .bookmark:hover,
     .bookmark_active {
@@ -190,6 +216,9 @@ export default {
     }
     .bookmark_archival {
         filter: saturate(0.6);
+    }
+    .bookmark___inner_chosen {
+        border: 1px solid #ffae00;
     }
     .bookmark__title {
         /* text-decoration: underline; */
@@ -215,77 +244,6 @@ export default {
         display: flex;
         flex-wrap: wrap;
     }
-    .bookmark__title-info-item {
-        border: 1px solid #6e6e6e;
-        border-radius: 10px;
-        padding: 0 8px 0 22px;
-        margin-right: 12px;
-        margin-top: 4px;
-        position: relative;
-        background-color: #f2f2f2;
-        color: #6e6e6e;
-        text-shadow: none;
-        font-weight: 600;
-        font-size: 12px;
-    }
-    .bookmark__title-info-item::before {
-        content: '';
-        border: 1px solid #6e6e6e;
-        border-radius: 10px;
-        width: 18px;
-        height: 18px;
-        position: absolute;
-        left: -1px;
-        top: -1px;
-        /* background-color: #6e6e6e; */
-        padding-left: 4px;
-        box-sizing: border-box;
-    }
-    .bookmark__title-info-item_archival {
-        color: #a0a0a0;
-        background-color: #fff;
-        border-color: #a0a0a0;
-        /* text-shadow: 0 0 0px black; */
-        font-weight: 600;
-    }
-    .bookmark__title-info-item_archival::before {
-        border-color: #a0a0a0;
-        content: '🕮';
-        font-size: 10px;
-        padding-left: 2px;
-        padding-top: 1px;
-    }
-    .bookmark__title-info-item_have-read,
-    .bookmark__title-info-item_reading,
-    .bookmark__title-info-item_new {
-        color: #fff;
-        line-height: 12px;
-        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
-    }
-    .bookmark__title-info-item_have-read {
-        border-color: #9de0c2;
-        background-color: #49cc90;
-    }
-    .bookmark__title-info-item_have-read::before {
-        border-color: transparent;
-        background-color: #9de0c2;
-    }
-    .bookmark__title-info-item_reading {
-        border-color: #ffd39d;
-        background-color: #fca130;
-    }
-    .bookmark__title-info-item_reading::before {
-        border-color: transparent;
-        background-color: #ffd39d;
-    }
-    .bookmark__title-info-item_new {
-        border-color: #ff9292;
-        background-color: #f93e3e;
-    }
-    .bookmark__title-info-item_new::before {
-        border-color: transparent;
-        background-color: #ff9292;
-    }
     .bookmark__buttons {
         display: flex;
         flex-grow: 1;
@@ -305,7 +263,10 @@ export default {
         font-weight: 200;
     }
     .bookmark__button_single:hover {
-        color: black;
+        color: #ffae00;
+    }
+    .bookmark__button_active {
+        color: #ffae00;
     }
     .bookmark__body {
         padding: 10px;
