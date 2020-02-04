@@ -13,8 +13,8 @@
             <nav class="nav-block__body-menu" :class="{ 'nav-block__body-menu_active': isOpened }">
                 <div v-if="title" class="nav-block__title">{{ title }}</div>
                 <nav-block-group title="Компоненты">
-                    <div class="nav-block__page" @click="toPage('boards')">➜ Доски</div>
-                    <div class="nav-block__page" @click="toPage('bookmarks')">➜ Закладки</div>
+                    <div class="nav-block__page" :class="{ 'nav-block__page_active': active === 'boards' }" @click="toPage('boards')">➜ Доски</div>
+                    <div class="nav-block__page" :class="{ 'nav-block__page_active': active === 'bookmarks' }" @click="toPage('bookmarks')">➜ Закладки</div>
                 </nav-block-group>
                 <slot name="menu"></slot>
             </nav>
@@ -164,6 +164,9 @@ export default {
         margin-left: 12px;
         margin-top: 4px;
         transition: all 0.3s;
+    }
+    .nav-block__page_active {
+        font-weight: bold;
     }
     .nav-block__page:hover {
         color: #5fc9fa;

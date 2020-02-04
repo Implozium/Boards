@@ -133,7 +133,7 @@ export default {
                 const container = textarea.closest('.modal') || document.body;
                 const scrollTop = container.scrollTop;
                 textarea.style.height = "";
-                textarea.style.height = textarea.scrollHeight + 3 + "px";
+                textarea.style.height = textarea.scrollHeight + 6 + "px";
                 container.scrollTop = scrollTop;
             }
         }
@@ -151,28 +151,28 @@ export default {
         color: grey;
         font-size: 14px;
         width: 100%;
-        padding: 20px 12px 0px 12px;
+        padding: 16px 12px 0px 12px;
         margin-bottom: 4px;
         box-sizing: border-box;
-        top: -2px;
+        top: 2px;
         left: 2px;
         pointer-events: none;
         transition: all 0.3s;
+        width: calc(100% - 20px);
     }
     .input-text__label_area {
-        background-color: white;
-        top: 1px;
-        width: calc(100% - 20px);
+        background-color: #fff;
+        top: 2px;
     }
     .input-text_filled .input-text__label,
     .input-text_active .input-text__label {
         font-size: 12px;
-        padding-top: 4px;
+        padding-top: 0px;
     }
     .input-text__input {
         width: 100%;
         border-radius: 4px;
-        border: 1px solid #ccc;
+        border: 2px solid #ccc;
         padding: 20px 12px 4px 12px;
         box-sizing: border-box;
         max-width: 100%;
@@ -183,6 +183,7 @@ export default {
         font-size: 14px;
         overflow-x: hidden;
         text-overflow: ellipsis;
+        background-color: #fff;
     }
     .input-text__input_tall {
         min-height: 104px;
@@ -197,8 +198,20 @@ export default {
         min-height: auto;
         height: auto;
     }
+    .input-text_error .input-text__label {
+        color: red;
+    }
     .input-text_error .input-text__input {
-        border: 1px solid red;
+        border: 2px solid red;
+    }
+    .input-text_active .input-text__label {
+        color: #61affe;
+        background-color: #fff;
+    }
+    .input-text_active .input-text__input {
+        border: 2px solid #61affe;
+        outline: none;
+        background-color: #fff;
     }
     .input-text__footer {
         min-height: 16px;

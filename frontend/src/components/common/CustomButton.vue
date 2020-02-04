@@ -37,6 +37,7 @@ export default {
         margin-right: 16px;
         box-sizing: border-box;
         text-align: center;
+        transition: all 0.3s;
     }
     .custom-button:last-of-type {
         margin-right: 0px;
@@ -58,6 +59,8 @@ export default {
     }
     .custom-button_default:hover {
         background-color: #fff;
+        border: 1px solid #0376fa;
+        color: #0376fa;
     }
     .custom-button_link {
         color: #0366d6;

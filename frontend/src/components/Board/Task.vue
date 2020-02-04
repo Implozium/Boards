@@ -27,16 +27,16 @@
                                 <menu-block class="task__button">
                                     <template v-slot:main>…</template>
                                     <menu-block-item @click="onEdit">редактировать</menu-block-item>
-                                    <menu-block-item @click="onMove">переместить</menu-block-item>
                                     <menu-block-hr></menu-block-hr>
                                     <menu-block-item type="ex" :checked="task.archival !== 0" @click="onArchive">архивная</menu-block-item>
-                                    <menu-block-item type="ex" :checked="task.undoneItems" @click="onUndoneItems">только незавершенные</menu-block-item>
+                                    <menu-block-item title="Показывать только незавершенные пункты" type="ex" :checked="task.undoneItems" @click="onUndoneItems">только&nbsp;незавершенные</menu-block-item>
                                     <menu-block-item @click="onOpen" v-if="task.description || task.items.length">{{ task.open ? 'свернуть' : 'развернуть' }}</menu-block-item>
                                     <menu-block-hr></menu-block-hr>
+                                    <menu-block-item @click="onMove">переместить</menu-block-item>
                                     <menu-block-item title="Преобразовать в доску" @click="onExpand">расширить</menu-block-item>
                                     <menu-block-item title="Добавить копию задачи в текущую доску" @click="onCopy">копировать</menu-block-item>
                                     <menu-block-item v-if="task.items.length" title="Разбить пункты этой задачи на отдельные задачи" @click="onExtract">разбить</menu-block-item>
-                                    <menu-block-item v-if="task.items.length" title="Разделить (переместить) пункты этой задачи в новую задачу" @click="onSeparate">разделить (переместить)</menu-block-item>
+                                    <menu-block-item v-if="task.items.length" title="Разделить (переместить) пункты этой задачи в новую задачу" @click="onSeparate">переместить&nbsp;пункты</menu-block-item>
                                     <menu-block-item title="Присоединить эту задачу к другой задаче" @click="onAttach">присоединить&nbsp;к</menu-block-item>
                                     <menu-block-hr></menu-block-hr>
                                     <menu-block-item @click="onRemove">удалить</menu-block-item>
@@ -332,11 +332,11 @@ export default {
         border-top: 2px solid #cfd9e7;
         border-bottom: 2px solid #cfd9e7;
         background-color: #4d607c;
-    } */
+    }
     .task__inner > div + div {
         border-top: 1px solid #cfd9e7;
     }
-    /* .task__inner > div:first-child {
+    .task__inner > div:first-child {
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
     }
